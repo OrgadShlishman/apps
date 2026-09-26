@@ -131,6 +131,7 @@
 let recognition = null;
 let recognizing = false;
 let finalTranscript = '';
+let processedFinalCount = 0;
 
 const transcriptEl = document.getElementById('transcript');
 const startBtn = document.getElementById('startBtn');
@@ -143,25 +144,121 @@ function getRecognitionCtor() {
   return window.SpeechRecognition || window.webkitSpeechRecognition || null;
 }
 
+// ---- lightweight speaker separation (pitch-based, 2 speakers) ----
+// Assumption: whoever speaks first is the patient. A second, sufficiently
+// different pitch register gets labeled as the doctor. This is a heuristic,
+// not real voice-print diarization, so it works best when the two voices
+// are clearly different (e.g. different gender/register).
+let audioCtx = null, analyser = null, micStream = null, pitchLoopId = null;
+let pitchBuffer = [];
+const speakerProfiles = [
+  { label: 'פציינט', pitch: null },
+  { label: 'רופא', pitch: null }
+];
+
+function autoCorrelatePitch(buf, sampleRate) {
+  const SIZE = buf.length;
+  let rms = 0;
+  for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+  rms = Math.sqrt(rms / SIZE);
+  if (rms < 0.01) return -1; // too quiet / silence
+
+  let r1 = 0, r2 = SIZE - 1;
+  const thres = 0.2;
+  for (let i = 0; i < SIZE / 2; i++) { if (Math.abs(buf[i]) < thres) { r1 = i; break; } }
+  for (let i = 1; i < SIZE / 2; i++) { if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; } }
+  const trimmed = buf.slice(r1, r2);
+  const n = trimmed.length;
+  const c = new Array(n).fill(0);
+  for (let lag = 0; lag < n; lag++) {
+    for (let i = 0; i < n - lag; i++) c[lag] += trimmed[i] * trimmed[i + lag];
+  }
+  let d = 0; while (d < n - 1 && c[d] > c[d + 1]) d++;
+  let maxVal = -1, maxPos = -1;
+  for (let i = d; i < n; i++) { if (c[i] > maxVal) { maxVal = c[i]; maxPos = i; } }
+  if (maxPos <= 0) return -1;
+  return sampleRate / maxPos;
+}
+
+function startPitchTracking(stream) {
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaStreamSource(stream);
+  analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 2048;
+  source.connect(analyser);
+  const buf = new Float32Array(analyser.fftSize);
+
+  function loop() {
+    analyser.getFloatTimeDomainData(buf);
+    const f = autoCorrelatePitch(buf, audioCtx.sampleRate);
+    if (f > 60 && f < 500) pitchBuffer.push(f); // human voice range
+    if (pitchBuffer.length > 120) pitchBuffer.shift();
+    pitchLoopId = requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+function stopPitchTracking() {
+  if (pitchLoopId) cancelAnimationFrame(pitchLoopId);
+  pitchLoopId = null;
+  if (micStream) micStream.getTracks().forEach(t => t.stop());
+  if (audioCtx) audioCtx.close();
+  audioCtx = null; analyser = null; micStream = null;
+  pitchBuffer = [];
+}
+
+function classifySpeaker() {
+  if (pitchBuffer.length === 0) return null;
+  const avg = pitchBuffer.reduce((a, b) => a + b, 0) / pitchBuffer.length;
+  pitchBuffer = [];
+
+  const [p0, p1] = speakerProfiles;
+  if (p0.pitch === null) { p0.pitch = avg; return p0.label; }
+  if (p1.pitch === null) {
+    if (Math.abs(avg - p0.pitch) > 20) { p1.pitch = avg; return p1.label; }
+    p0.pitch = p0.pitch * 0.7 + avg * 0.3;
+    return p0.label;
+  }
+  const d0 = Math.abs(avg - p0.pitch), d1 = Math.abs(avg - p1.pitch);
+  if (d0 <= d1) { p0.pitch = p0.pitch * 0.7 + avg * 0.3; return p0.label; }
+  p1.pitch = p1.pitch * 0.7 + avg * 0.3; return p1.label;
+}
+
 function startRecording() {
   const Ctor = getRecognitionCtor();
   if (!Ctor) {
     alert('הדפדפן הזה לא תומך בהמרת דיבור לטקסט. מומלץ Chrome או Edge.');
     return;
   }
+
+  speakerProfiles[0].pitch = null;
+  speakerProfiles[1].pitch = null;
+
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+    micStream = stream;
+    startPitchTracking(stream);
+  }).catch(() => { /* diarization unavailable, transcript still works */ });
+
   recognition = new Ctor();
   recognition.lang = langSelect.value;
-  recognition.continuous = true;
+  recognition.continuous = false;
   recognition.interimResults = true;
+  processedFinalCount = 0;
 
   recognition.onresult = (event) => {
     let interim = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const chunk = event.results[i][0].transcript;
+    for (let i = 0; i < event.results.length; i++) {
       if (event.results[i].isFinal) {
-        finalTranscript += chunk + ' ';
+        if (i >= processedFinalCount) {
+          const chunk = event.results[i][0].transcript.trim();
+          if (chunk) {
+            const speaker = classifySpeaker();
+            finalTranscript += (speaker ? `[${speaker}] ` : '') + chunk + '\n';
+          }
+          processedFinalCount = i + 1;
+        }
       } else {
-        interim += chunk;
+        interim += event.results[i][0].transcript;
       }
     }
     transcriptEl.value = finalTranscript + interim;
@@ -174,8 +271,9 @@ function startRecording() {
 
   recognition.onend = () => {
     if (recognizing) {
-      // auto-restart (browser stops after silence/timeouts)
-      try { recognition.start(); } catch (e) {}
+      // restart for the next utterance (continuous:false avoids the
+      // duplicate-word bug seen on some mobile browsers in continuous mode)
+      try { recognition.start(); processedFinalCount = 0; } catch (e) {}
     }
   };
 
@@ -190,6 +288,7 @@ function startRecording() {
 function stopRecording() {
   recognizing = false;
   if (recognition) recognition.stop();
+  stopPitchTracking();
   indicator.classList.remove('live');
   startBtn.disabled = false;
   stopBtn.disabled = true;
