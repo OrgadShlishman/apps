@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Lifeguard Pool Monitor</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1e33">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: system-ui, -apple-system, Arial, sans-serif;
+    background:#0b1e33; color:#eaf2ff; min-height:100vh;
+    display:flex; flex-direction:column;
+  }
+  header {
+    padding:14px 16px; display:flex; justify-content:space-between; align-items:center;
+    background:#0d2540; border-bottom:1px solid #1c3a5e;
+  }
+  header h1 { font-size:18px; margin:0; }
+  #status { font-size:12px; color:#8fb8e6; }
+
+  #pool-wrap { padding:14px; }
+  #pool {
+    position:relative; width:100%; aspect-ratio: 4/3;
+    background: repeating-linear-gradient(0deg, #0e3a5f 0 20px, #114876 20px 40px);
+    border:4px solid #1c5c8f; border-radius:10px; overflow:hidden;
+  }
+  .dot {
+    position:absolute; width:34px; height:34px; border-radius:50%;
+    background:#2ecc71; box-shadow:0 0 10px #2ecc71;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; font-weight:bold; color:#03210f;
+    transform:translate(-50%,-50%); transition:left .8s linear, top .8s linear;
+    cursor:pointer; border:2px solid rgba(255,255,255,.6);
+  }
+  .dot.critical {
+    background:#e74c3c; color:#fff; box-shadow:0 0 16px #e74c3c;
+    animation: blink 0.6s infinite;
+  }
+  @keyframes blink { 50% { opacity:0.25; } }
+
+  #roster { padding:0 14px 14px; }
+  #roster h2 { font-size:14px; color:#8fb8e6; margin:6px 0; }
+  .row {
+    display:flex; justify-content:space-between; align-items:center;
+    background:#0d2540; border:1px solid #1c3a5e; border-radius:8px;
+    padding:10px 12px; margin-bottom:6px; cursor:pointer;
+  }
+  .row.critical { border-color:#e74c3c; background:#301418; }
+  .bpm { font-weight:bold; font-size:16px; }
+  .bpm.critical { color:#ff6b5b; }
+  .bpm.ok { color:#2ecc71; }
+
+  #alert-overlay {
+    position:fixed; inset:0; background:rgba(200,20,20,.96);
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; z-index:50; animation: flash 0.8s infinite;
+    padding:20px;
+  }
+  @keyframes flash { 50% { background:rgba(120,10,10,.96); } }
+  #alert-overlay h2 { font-size:26px; margin:0 0 10px; }
+  #alert-overlay p { font-size:18px; margin:4px 0; }
+  #alert-overlay button {
+    margin-top:20px; padding:12px 28px; font-size:16px; border:none;
+    border-radius:8px; background:#fff; color:#a10000; font-weight:bold;
+  }
+
+  #detail-overlay {
+    position:fixed; inset:0; background:#0b1e33; display:none;
+    z-index:40; padding:16px; flex-direction:column;
+  }
+  #detail-overlay canvas { background:#0d2540; border-radius:8px; margin-top:12px; }
+  .closeBtn { align-self:flex-end; background:none; border:none; color:#8fb8e6; font-size:20px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏊 חדר בקרה - מציל</h1>
+  <span id="status">3 מתרחצים | סימולציה</span>
+</header>
+
+<div id="pool-wrap">
+  <div id="pool"></div>
+</div>
+
+<div id="roster">
+  <h2>מתרחצים</h2>
+  <div id="rows"></div>
+</div>
+
+<div id="alert-overlay">
+  <h2>⚠️ דופק חורג מהטווח!</h2>
+  <p id="alert-text"></p>
+  <button onclick="ackAlert()">אישור</button>
+</div>
+
+<div id="detail-overlay">
+  <button class="closeBtn" onclick="closeDetail()">✕ סגור</button>
+  <h2 id="detail-name"></h2>
+  <p id="detail-bpm" style="font-size:22px;"></p>
+  <canvas id="detail-chart" width="320" height="160"></canvas>
+</div>
+
+<script>
+const MIN_BPM = 55, MAX_BPM = 150;
+const NAMES = ["דנה", "יואב", "נועה", "אורי", "מיה"];
+
+function makeSwimmer(id, name) {
+  return {
+    id, name,
+    x: 15 + Math.random()*70,
+    y: 15 + Math.random()*70,
+    bpm: 70 + Math.random()*30,
+    history: [],
+    critical: false
+  };
+}
+
+let swimmers = NAMES.slice(0,3).map((n,i)=>makeSwimmer(i,n));
+let activeAlertId = null;
+let ackedIds = new Set();
+let selectedId = null;
+
+function stepSwimmer(s) {
+  // random walk position
+  s.x = Math.min(90, Math.max(10, s.x + (Math.random()-0.5)*8));
+  s.y = Math.min(90, Math.max(10, s.y + (Math.random()-0.5)*8));
+
+  // random walk bpm, with occasional spike to simulate distress
+  let delta = (Math.random()-0.5)*10;
+  if (Math.random() < 0.03) delta += (Math.random()<0.5 ? -1:1) * 40; // rare spike
+  s.bpm = Math.round(Math.max(35, Math.min(190, s.bpm + delta)));
+
+  s.history.push(s.bpm);
+  if (s.history.length > 30) s.history.shift();
+
+  const wasCritical = s.critical;
+  s.critical = s.bpm < MIN_BPM || s.bpm > MAX_BPM;
+  if (s.critical && !wasCritical) {
+    ackedIds.delete(s.id);
+  }
+}
+
+function vibrate(pattern) {
+  if (navigator.vibrate) navigator.vibrate(pattern);
+}
+
+function render() {
+  const pool = document.getElementById('pool');
+  pool.innerHTML = '';
+  let anyUnacked = null;
+
+  swimmers.forEach(s => {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (s.critical ? ' critical' : '');
+    dot.style.left = s.x + '%';
+    dot.style.top = s.y + '%';
+    dot.textContent = s.bpm;
+    dot.onclick = () => openDetail(s.id);
+    pool.appendChild(dot);
+    if (s.critical && !ackedIds.has(s.id)) anyUnacked = s;
+  });
+
+  const rows = document.getElementById('rows');
+  rows.innerHTML = '';
+  swimmers.forEach(s => {
+    const row = document.createElement('div');
+    row.className = 'row' + (s.critical ? ' critical' : '');
+    row.onclick = () => openDetail(s.id);
+    row.innerHTML = `<span>${s.name}</span><span class="bpm ${s.critical?'critical':'ok'}">${s.bpm} BPM</span>`;
+    rows.appendChild(row);
+  });
+
+  document.getElementById('status').textContent = swimmers.length + ' מתרחצים | סימולציה';
+
+  const overlay = document.getElementById('alert-overlay');
+  if (anyUnacked) {
+    activeAlertId = anyUnacked.id;
+    overlay.style.display = 'flex';
+    document.getElementById('alert-text').textContent =
+      `${anyUnacked.name}: ${anyUnacked.bpm} BPM (טווח תקין: ${MIN_BPM}-${MAX_BPM})`;
+    vibrate([300,150,300,150,300]);
+  } else {
+    overlay.style.display = 'none';
+  }
+
+  if (selectedId !== null) updateDetail();
+}
+
+function ackAlert() {
+  if (activeAlertId !== null) ackedIds.add(activeAlertId);
+  document.getElementById('alert-overlay').style.display = 'none';
+}
+
+function openDetail(id) {
+  selectedId = id;
+  document.getElementById('detail-overlay').style.display = 'flex';
+  updateDetail();
+}
+function closeDetail() {
+  selectedId = null;
+  document.getElementById('detail-overlay').style.display = 'none';
+}
+function updateDetail() {
+  const s = swimmers.find(x=>x.id===selectedId);
+  if (!s) return;
+  document.getElementById('detail-name').textContent = s.name;
+  document.getElementById('detail-bpm').innerHTML =
+    `דופק נוכחי: <span style="color:${s.critical?'#ff6b5b':'#2ecc71'}">${s.bpm} BPM</span>`;
+  const c = document.getElementById('detail-chart');
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0,0,c.width,c.height);
+  ctx.strokeStyle = '#2ecc71';
+  ctx.beginPath();
+  const h = s.history;
+  h.forEach((v,i)=>{
+    const x = (i/(29))*c.width;
+    const y = c.height - ((v-35)/(190-35))*c.height;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+}
+
+setInterval(()=>{
+  swimmers.forEach(stepSwimmer);
+  render();
+}, 1000);
+
+render();
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
