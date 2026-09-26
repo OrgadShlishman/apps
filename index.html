@@ -54,18 +54,19 @@
   .bpm.ok { color:#2ecc71; }
 
   #alert-overlay {
-    position:fixed; inset:0; background:rgba(200,20,20,.96);
-    display:none; flex-direction:column; align-items:center; justify-content:center;
-    text-align:center; z-index:50; animation: flash 0.8s infinite;
-    padding:20px;
+    position:fixed; bottom:0; left:0; right:0; background:#c81414;
+    display:none; flex-direction:row; align-items:center; justify-content:space-between;
+    gap:10px; z-index:50; animation: flash 0.8s infinite;
+    padding:10px 14px; box-shadow:0 -4px 14px rgba(0,0,0,.5);
   }
-  @keyframes flash { 50% { background:rgba(120,10,10,.96); } }
-  #alert-overlay h2 { font-size:26px; margin:0 0 10px; }
-  #alert-overlay p { font-size:18px; margin:4px 0; }
+  @keyframes flash { 50% { background:#7a0a0a; } }
+  #alert-overlay h2 { font-size:16px; margin:0; white-space:nowrap; }
+  #alert-overlay p { font-size:14px; margin:0; flex:1; text-align:right; }
   #alert-overlay button {
-    margin-top:20px; padding:12px 28px; font-size:16px; border:none;
-    border-radius:8px; background:#fff; color:#a10000; font-weight:bold;
+    padding:8px 16px; font-size:14px; border:none;
+    border-radius:8px; background:#fff; color:#a10000; font-weight:bold; white-space:nowrap;
   }
+  body { padding-bottom:70px; }
 
   #detail-overlay {
     position:fixed; inset:0; background:#0b1e33; display:none;
@@ -138,17 +139,27 @@ function stepSwimmer(s) {
 
   // random walk bpm, with occasional spike to simulate distress
   let delta = (Math.random()-0.5)*10;
-  if (Math.random() < 0.03) delta += (Math.random()<0.5 ? -1:1) * 40; // rare spike
+  if (Math.random() < 0.012) delta += (Math.random()<0.5 ? -1:1) * 40; // rare spike
   s.bpm = Math.round(Math.max(35, Math.min(190, s.bpm + delta)));
+
+  const wasCritical = s.critical;
+  let nowCritical = s.bpm < MIN_BPM || s.bpm > MAX_BPM;
+
+  // never more than 2 in distress at once; 2 at once is rare
+  if (nowCritical && !wasCritical) {
+    const others = swimmers.filter(o => o.id !== s.id && o.critical).length;
+    const allowed = others === 0 ? true : (others === 1 ? Math.random() < 0.07 : false);
+    if (!allowed) {
+      s.bpm = 80 + Math.round(Math.random()*30); // pull back to a normal pulse
+      nowCritical = false;
+    }
+  }
+
+  s.critical = nowCritical;
+  if (s.critical && !wasCritical) ackedIds.delete(s.id);
 
   s.history.push(s.bpm);
   if (s.history.length > 30) s.history.shift();
-
-  const wasCritical = s.critical;
-  s.critical = s.bpm < MIN_BPM || s.bpm > MAX_BPM;
-  if (s.critical && !wasCritical) {
-    ackedIds.delete(s.id);
-  }
 }
 
 function vibrate(pattern) {
