@@ -78,6 +78,12 @@
     <option value="pt-BR">Português</option>
   </select>
 </header>
+<div class="no-print" style="padding:8px 16px; background:#0d2540; border-bottom:1px solid #1c3a5e; font-size:13px;">
+  <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+    <input type="checkbox" id="diarizeToggle">
+    הפרדת דוברים לפי גובה קול (ניסיוני - עלול להפריע להקלטה בטלפון, מומלץ לבדוק קודם בלי זה)
+  </label>
+</div>
 
 <main>
 
@@ -149,7 +155,7 @@ function getRecognitionCtor() {
 // different pitch register gets labeled as the doctor. This is a heuristic,
 // not real voice-print diarization, so it works best when the two voices
 // are clearly different (e.g. different gender/register).
-let audioCtx = null, analyser = null, micStream = null, pitchLoopId = null;
+let audioCtx = null, analyser = null, micStream = null, pitchLoopId = null, diarizeEnabled = false;
 let pitchBuffer = [];
 const speakerProfiles = [
   { label: 'פציינט', pitch: null },
@@ -208,7 +214,7 @@ function stopPitchTracking() {
 }
 
 function classifySpeaker() {
-  if (pitchBuffer.length === 0) return null;
+  if (!diarizeEnabled || pitchBuffer.length === 0) return null;
   const avg = pitchBuffer.reduce((a, b) => a + b, 0) / pitchBuffer.length;
   pitchBuffer = [];
 
@@ -233,11 +239,14 @@ function startRecording() {
 
   speakerProfiles[0].pitch = null;
   speakerProfiles[1].pitch = null;
+  diarizeEnabled = document.getElementById('diarizeToggle').checked;
 
-  navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
-    micStream = stream;
-    startPitchTracking(stream);
-  }).catch(() => { /* diarization unavailable, transcript still works */ });
+  if (diarizeEnabled) {
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      micStream = stream;
+      startPitchTracking(stream);
+    }).catch(() => { diarizeEnabled = false; });
+  }
 
   recognition = new Ctor();
   recognition.lang = langSelect.value;
