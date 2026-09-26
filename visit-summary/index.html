@@ -1,1 +1,321 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>סיכום ביקור - עוזר תיעוד</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1e33">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin:0; font-family: system-ui, -apple-system, Arial, sans-serif;
+    background:#0b1e33; color:#eaf2ff; min-height:100vh;
+  }
+  header {
+    padding:14px 16px; background:#0d2540; border-bottom:1px solid #1c3a5e;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  }
+  header h1 { font-size:17px; margin:0; }
+  main { padding:14px; max-width:900px; margin:0 auto; }
 
+  .card {
+    background:#0d2540; border:1px solid #1c3a5e; border-radius:10px;
+    padding:14px; margin-bottom:14px;
+  }
+  .card h2 { font-size:14px; color:#8fb8e6; margin:0 0 10px; }
+
+  select, button, textarea {
+    font-family: inherit; font-size:14px; border-radius:8px; border:1px solid #1c5c8f;
+    background:#0e3a5f; color:#eaf2ff; padding:8px 10px;
+  }
+  select { min-width:140px; }
+  button { cursor:pointer; }
+  button.primary { background:#2ecc71; color:#03210f; font-weight:bold; border:none; }
+  button.danger { background:#e74c3c; color:#fff; font-weight:bold; border:none; }
+  button.ghost { background:transparent; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+
+  #rec-row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  #rec-indicator {
+    width:12px; height:12px; border-radius:50%; background:#555; display:inline-block;
+  }
+  #rec-indicator.live { background:#e74c3c; animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity:.2; } }
+
+  #transcript {
+    width:100%; min-height:160px; resize:vertical; white-space:pre-wrap;
+    line-height:1.5;
+  }
+  textarea { width:100%; resize:vertical; }
+
+  .field { margin-bottom:12px; }
+  .field label { display:block; font-size:13px; color:#8fb8e6; margin-bottom:4px; }
+  .field textarea { min-height:70px; }
+
+  #actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+
+  @media print {
+    header, #rec-row, #genBtn, #actions, .no-print { display:none !important; }
+    body { background:#fff; color:#000; }
+    .card { border:1px solid #999; background:#fff; color:#000; }
+    .card h2 { color:#000; }
+    .field textarea { color:#000; background:#fff; border:1px solid #999; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🩺 עוזר תיעוד ביקור</h1>
+  <select id="lang">
+    <option value="he-IL">עברית</option>
+    <option value="en-US">English</option>
+    <option value="ar-SA">العربية</option>
+    <option value="ru-RU">Русский</option>
+    <option value="es-ES">Español</option>
+    <option value="pt-BR">Português</option>
+  </select>
+</header>
+
+<main>
+
+  <div class="card">
+    <h2>הקלטה ותמלול</h2>
+    <div id="rec-row">
+      <span id="rec-indicator"></span>
+      <button id="startBtn" class="primary">▶ התחל הקלטה</button>
+      <button id="stopBtn" class="danger" disabled>■ עצור</button>
+      <button id="clearBtn" class="ghost">נקה הכל</button>
+    </div>
+    <p style="font-size:12px;color:#8fb8e6;margin:8px 0 4px;">התמלול הוא של כל השיחה כמקטע אחד (אין הבחנה אוטומטית בין רופא לפציינט).</p>
+    <textarea id="transcript" placeholder="התמלול יופיע כאן בזמן אמת..."></textarea>
+  </div>
+
+  <div class="card">
+    <h2>סיכום ביקור (טיוטה אוטומטית - יש לבדוק ולתקן)</h2>
+    <button id="genBtn" class="primary" style="margin-bottom:14px;">🧠 הפק סיכום מהתמלול</button>
+
+    <div class="field">
+      <label>תלונות הפציינט</label>
+      <textarea id="f-complaints"></textarea>
+    </div>
+    <div class="field">
+      <label>המלצות הרופא</label>
+      <textarea id="f-recommendations"></textarea>
+    </div>
+    <div class="field">
+      <label>תרופות שניתנו / נקבעו</label>
+      <textarea id="f-medications"></textarea>
+    </div>
+    <div class="field">
+      <label>הפניות</label>
+      <textarea id="f-referrals"></textarea>
+    </div>
+    <div class="field">
+      <label>הערות נוספות רלוונטיות</label>
+      <textarea id="f-other"></textarea>
+    </div>
+
+    <div id="actions">
+      <button id="printBtn">🖨️ הדפס</button>
+      <button id="copyBtn">📋 העתק סיכום</button>
+      <button id="downloadBtn">⬇️ הורד כקובץ טקסט</button>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let recognition = null;
+let recognizing = false;
+let finalTranscript = '';
+
+const transcriptEl = document.getElementById('transcript');
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const clearBtn = document.getElementById('clearBtn');
+const indicator = document.getElementById('rec-indicator');
+const langSelect = document.getElementById('lang');
+
+function getRecognitionCtor() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+
+function startRecording() {
+  const Ctor = getRecognitionCtor();
+  if (!Ctor) {
+    alert('הדפדפן הזה לא תומך בהמרת דיבור לטקסט. מומלץ Chrome או Edge.');
+    return;
+  }
+  recognition = new Ctor();
+  recognition.lang = langSelect.value;
+  recognition.continuous = true;
+  recognition.interimResults = true;
+
+  recognition.onresult = (event) => {
+    let interim = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const chunk = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += chunk + ' ';
+      } else {
+        interim += chunk;
+      }
+    }
+    transcriptEl.value = finalTranscript + interim;
+    transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  };
+
+  recognition.onerror = (e) => {
+    console.error('Speech recognition error', e.error);
+  };
+
+  recognition.onend = () => {
+    if (recognizing) {
+      // auto-restart (browser stops after silence/timeouts)
+      try { recognition.start(); } catch (e) {}
+    }
+  };
+
+  recognition.start();
+  recognizing = true;
+  indicator.classList.add('live');
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
+  langSelect.disabled = true;
+}
+
+function stopRecording() {
+  recognizing = false;
+  if (recognition) recognition.stop();
+  indicator.classList.remove('live');
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+  langSelect.disabled = false;
+}
+
+startBtn.onclick = startRecording;
+stopBtn.onclick = stopRecording;
+clearBtn.onclick = () => {
+  finalTranscript = '';
+  transcriptEl.value = '';
+  ['f-complaints','f-recommendations','f-medications','f-referrals','f-other'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+};
+transcriptEl.addEventListener('input', () => { finalTranscript = transcriptEl.value; });
+
+// ---- heuristic extraction ----
+
+const RULES = {
+  complaints: [
+    'כואב','כאב','מרגיש','מרגישה','סובל','סובלת','לא טוב','חלש','חלשה','סחרחורת',
+    'קוצר נשימה','חום','שיעול','בחילה','עייף','עייפה','נפיחות',
+    'hurts','pain','feel','feeling','suffering','dizziness','fever','cough','nausea','tired','ache',
+    'duele','dolor','siento','fiebre','tos','duele','кашель','боль','болит','температура','усталость',
+    'ألم','يؤلم','أشعر','حمى','سعال','دوخة','dor','dói','sinto','febre','tosse'
+  ],
+  recommendations: [
+    'אני ממליץ','ממליצה','מומלץ','כדאי','תשתדל','תשתדלי','צריך לנוח','מנוחה','דיאטה','תזונה',
+    'מומלץ לחזור','בדיקה נוספת','להימנע',
+    'i recommend','recommendation','advise','rest','avoid','follow up','recomiendo','descanso',
+    'рекомендую','советую','أوصي','ينصح','recomendo','descanso'
+  ],
+  medications: [
+    'תרופה','תרופות','מ"ג','מיליגרם','כדור','כדורים','משחה','אנטיביוטיקה','לקחת פעמיים',
+    'מרשם','נוגד','אקמול','אופטלגין','נורופן',
+    'medication','prescription','tablet','mg','antibiotic','dose','pill',
+    'medicamento','receta','pastilla','лекарство','рецепт','таблетка','دواء','وصفة','حبوب',
+    'medicamento','receita','comprimido'
+  ],
+  referrals: [
+    'הפניה','מפנה','מומחה','רופא עיניים','אורתופד','קרדיולוג','דימות','רנטגן','בדיקת דם','אולטרסאונד','MRI','CT',
+    'referral','refer','specialist','radiology','blood test','ultrasound',
+    'derivación','especialista','referencia','направление','специалист','إحالة','أخصائي','referência','especialista'
+  ]
+};
+
+function splitSentences(text) {
+  return text.split(/(?<=[.!?׃])\s+|\n+/).map(s => s.trim()).filter(Boolean);
+}
+
+function classify(text) {
+  const sentences = splitSentences(text);
+  const result = { complaints: [], recommendations: [], medications: [], referrals: [], other: [] };
+  sentences.forEach(sentence => {
+    const lower = sentence.toLowerCase();
+    let matched = false;
+    for (const cat of ['medications','referrals','recommendations','complaints']) {
+      if (RULES[cat].some(kw => lower.includes(kw.toLowerCase()))) {
+        result[cat].push(sentence);
+        matched = true;
+        break;
+      }
+    }
+    if (!matched && sentence.length > 8) result.other.push(sentence);
+  });
+  return result;
+}
+
+document.getElementById('genBtn').onclick = () => {
+  const text = transcriptEl.value.trim();
+  if (!text) { alert('אין תמלול להפקת סיכום'); return; }
+  const r = classify(text);
+  document.getElementById('f-complaints').value = r.complaints.join('\n');
+  document.getElementById('f-recommendations').value = r.recommendations.join('\n');
+  document.getElementById('f-medications').value = r.medications.join('\n');
+  document.getElementById('f-referrals').value = r.referrals.join('\n');
+  document.getElementById('f-other').value = r.other.join('\n');
+};
+
+function buildSummaryText() {
+  const g = id => document.getElementById(id).value.trim();
+  return [
+    'סיכום ביקור',
+    '',
+    'תלונות הפציינט:',
+    g('f-complaints') || '-',
+    '',
+    'המלצות הרופא:',
+    g('f-recommendations') || '-',
+    '',
+    'תרופות:',
+    g('f-medications') || '-',
+    '',
+    'הפניות:',
+    g('f-referrals') || '-',
+    '',
+    'הערות נוספות:',
+    g('f-other') || '-'
+  ].join('\n');
+}
+
+document.getElementById('printBtn').onclick = () => window.print();
+
+document.getElementById('copyBtn').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(buildSummaryText());
+    alert('הסיכום הועתק');
+  } catch (e) {
+    alert('העתקה נכשלה, אפשר לסמן ולהעתיק ידנית');
+  }
+};
+
+document.getElementById('downloadBtn').onclick = () => {
+  const blob = new Blob([buildSummaryText()], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'visit-summary.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
