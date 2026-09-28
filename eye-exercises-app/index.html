@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>רגע לעיניים</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0f2a24">
+<link rel="apple-touch-icon" href="icon.png">
+<style>
+  * { box-sizing:border-box; }
+  body {
+    margin:0; font-family: system-ui, -apple-system, Arial, sans-serif;
+    background:#0f2a24; color:#eafff5; min-height:100vh;
+  }
+  #app { max-width:480px; margin:0 auto; padding:16px 16px 40px; }
+
+  .hero { text-align:center; padding:20px 10px 10px; }
+  .hero-emoji { font-size:40px; }
+  .hero h1 { font-size:22px; margin:6px 0 4px; }
+  .hero .sub { color:#9fd8c4; font-size:14px; margin:0 0 16px; }
+  .cta {
+    background:#2ecc87; color:#04241a; border:none; border-radius:14px;
+    padding:16px 30px; font-size:17px; font-weight:bold; cursor:pointer;
+    box-shadow:0 4px 14px rgba(46,204,135,.35);
+  }
+  .hero-note { color:#7fb9a5; font-size:12px; margin-top:8px; }
+
+  #voiceBtn {
+    position:fixed; top:12px; left:12px; z-index:30;
+    background:#123b32; border:1px solid #2a5c4d; color:#eafff5;
+    border-radius:50%; width:40px; height:40px; font-size:18px; cursor:pointer;
+  }
+
+  .stats-strip { display:flex; gap:10px; margin:16px 0; }
+  .stat { flex:1; background:#123b32; border-radius:12px; padding:12px; text-align:center; }
+  .stat-num { font-size:20px; font-weight:bold; }
+  .stat-label { font-size:11px; color:#9fd8c4; margin-top:2px; }
+
+  .card { background:#123b32; border-radius:14px; padding:16px; margin-bottom:14px; }
+  .goals-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  .goals-title { font-weight:bold; font-size:15px; }
+  .grade-badge { background:#2ecc87; color:#04241a; font-size:11px; font-weight:bold; padding:4px 10px; border-radius:20px; }
+
+  .week-strip { display:flex; justify-content:space-between; margin:8px 0 14px; }
+  .day { text-align:center; flex:1; }
+  .day-name { font-size:11px; color:#9fd8c4; }
+  .day-dot { width:26px; height:26px; border-radius:50%; background:#0f2a24; border:1px solid #2a5c4d; margin:4px auto 0; display:flex; align-items:center; justify-content:center; font-size:12px; }
+  .day.done .day-dot { background:#2ecc87; color:#04241a; border-color:#2ecc87; }
+  .day.today .day-name { color:#fff; font-weight:bold; }
+
+  .goal-row { display:flex; align-items:center; gap:10px; font-size:14px; margin-bottom:6px; }
+  .goal-num { font-weight:bold; font-size:16px; min-width:20px; text-align:center; }
+  button.small { background:#0f2a24; border:1px solid #2a5c4d; color:#eafff5; border-radius:8px; width:30px; height:30px; font-size:16px; cursor:pointer; }
+  .goal-msg { font-size:12px; color:#9fd8c4; }
+
+  .station-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .station-card { background:#0f2a24; border:1px solid #2a5c4d; border-radius:12px; padding:10px; cursor:pointer; }
+  .st-num { width:22px; height:22px; border-radius:50%; background:#2ecc87; color:#04241a; font-size:12px; font-weight:bold; display:flex; align-items:center; justify-content:center; margin-bottom:6px; }
+  .st-name { font-size:13px; font-weight:bold; margin-bottom:3px; }
+  .st-hint { font-size:11px; color:#9fd8c4; }
+
+  .break-card { display:flex; align-items:center; gap:12px; cursor:pointer; }
+  .break-icon { font-size:28px; }
+
+  .train-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; }
+  .back { background:#123b32; border:none; color:#eafff5; border-radius:50%; width:34px; height:34px; font-size:16px; cursor:pointer; }
+  .progress-dots { display:flex; gap:6px; }
+  .pdot { width:9px; height:9px; border-radius:50%; background:#2a5c4d; }
+  .pdot.active { background:#2ecc87; width:12px; height:12px; }
+  .pdot.past { background:#1a7a55; }
+
+  .station-view { text-align:center; }
+  .st-title { font-size:16px; font-weight:bold; margin-bottom:4px; }
+  .eq-note { font-size:12px; color:#9fd8c4; margin-bottom:8px; }
+  .anim-area { height:120px; display:flex; align-items:center; justify-content:center; margin:10px 0; }
+
+  .timer-ring-wrap { margin:6px 0; }
+  .timer-num { font-size:34px; font-weight:bold; }
+  .progress-bar { height:6px; background:#0f2a24; border-radius:4px; overflow:hidden; margin:8px 0 16px; }
+  .progress-fill { height:100%; background:#2ecc87; transition:width 1s linear; }
+
+  .steps-list { text-align:right; font-size:13px; line-height:1.6; padding-right:20px; margin:0 0 10px; }
+  .pressure-note { font-size:12px; color:#ffb85c; margin-bottom:8px; }
+  .feel-line { font-size:13px; color:#9fd8c4; font-style:italic; margin-bottom:14px; }
+
+  .train-controls { display:flex; gap:10px; justify-content:center; }
+  .train-controls button { background:#0f2a24; border:1px solid #2a5c4d; color:#eafff5; border-radius:10px; padding:10px 16px; font-size:13px; cursor:pointer; }
+
+  .summary-card { text-align:center; }
+  .summary-card p { font-size:14px; margin:6px 0; }
+
+  .break-view { text-align:center; }
+  .break-phase { font-size:15px; color:#9fd8c4; margin-bottom:10px; }
+  .break-ring {
+    width:180px; height:180px; border-radius:50%; border:8px solid #2a5c4d;
+    display:flex; align-items:center; justify-content:center; margin:0 auto 16px;
+  }
+  .break-ring.look { border-color:#2ecc87; }
+  .break-num { font-size:28px; font-weight:bold; }
+  .break-note { font-size:12px; color:#9fd8c4; margin-bottom:14px; }
+
+  .disclaimer { font-size:11px; color:#7fb9a5; border-top:1px solid #2a5c4d; padding-top:12px; margin-top:6px; line-height:1.6; }
+  .disc-title { font-weight:bold; color:#9fd8c4; margin-bottom:4px; }
+  .disclaimer a { color:#7fd8c4; }
+
+  /* animations */
+  .anim-focus { position:relative; width:200px; height:80px; }
+  .anim-focus .dot { position:absolute; width:16px; height:16px; border-radius:50%; background:#2ecc87; top:32px; animation: focusMove 10s infinite; }
+  .anim-focus .dot.near { right:20px; }
+  .anim-focus .dot.far { left:20px; opacity:.3; }
+  @keyframes focusMove { 0%,45% {transform:scale(1);} 50%,95%{transform:scale(.4);} 100%{transform:scale(1);} }
+
+  .anim-fig8 { position:relative; width:180px; height:90px; }
+  .anim-fig8 .mover { position:absolute; width:14px; height:14px; border-radius:50%; background:#2ecc87;
+    animation: fig8 6s linear infinite; }
+  @keyframes fig8 {
+    0% { left:0; top:45px; } 12.5%{left:45px; top:0;} 25%{left:90px; top:45px;} 37.5%{left:45px; top:90px;}
+    50% { left:0; top:45px; } 62.5%{left:-45px; top:0;} 75%{left:-90px; top:45px;} 87.5%{left:-45px; top:90px;}
+    100% { left:0; top:45px; }
+  }
+
+  .anim-rotate { position:relative; width:100px; height:100px; }
+  .anim-rotate .mover2 { position:absolute; width:14px; height:14px; border-radius:50%; background:#2ecc87;
+    top:0; right:43px; animation: rot 5s linear infinite; transform-origin:50px 50px; }
+  @keyframes rot { from{ transform:rotate(0deg) translateY(0);} to{ transform:rotate(360deg) translateY(0);} }
+
+  .anim-blink .eye { width:60px; height:30px; border:3px solid #2ecc87; border-radius:50%; animation: blinkAnim 3s infinite; }
+  @keyframes blinkAnim { 0%,90%,100%{ height:30px; } 95%{ height:2px; } }
+
+  .anim-palm { font-size:56px; }
+  .anim-pushup .pencil { font-size:44px; display:inline-block; animation: pushup 4s ease-in-out infinite; }
+  @keyframes pushup { 0%,100%{ transform:translateX(60px) scale(1);} 50%{ transform:translateX(-20px) scale(1.6);} }
+  .anim-faraway { font-size:56px; }
+</style>
+</head>
+<body>
+<button id="voiceBtn" onclick="toggleVoice()">🔊</button>
+<div id="app"></div>
+<script src="app.js"></script>
+</body>
+</html>
