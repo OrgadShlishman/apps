@@ -42,6 +42,13 @@
     width:100%; padding:9px 10px; background:#132a20; border:1px solid #2a4d3c; color:#eef2ef;
     border-radius:8px; font-size:13px;
   }
+  .scope-label {
+    grid-column: span 2;
+    white-space: normal !important;
+  }
+  @media (max-width: 480px) {
+    .scope-label { grid-column: 1 / -1; }
+  }
   .result-count { font-size:12px; color:#8fa89c; margin-bottom:10px; }
 
   /* player cards */
@@ -214,13 +221,13 @@
     <select id="f-league">
       <option value="" data-i18n="optAllLeagues"></option>
     </select>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+    <label class="scope-label" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;">
       <input type="checkbox" id="f-scope-active" checked style="width:auto;"> <span data-i18n="labelScopeActive"></span>
     </label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+    <label class="scope-label" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;">
       <input type="checkbox" id="f-scope-retired" style="width:auto;"> <span data-i18n="labelScopeRetired"></span>
     </label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+    <label class="scope-label" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;">
       <input type="checkbox" id="f-scope-firstteam" style="width:auto;"> <span data-i18n="labelScopeFirstTeam"></span>
     </label>
   </div>
@@ -235,13 +242,13 @@
     <button data-f="442">4-4-2</button>
   </div>
   <div class="filters" style="margin-bottom:8px;">
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+    <label class="scope-label" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;">
       <input type="checkbox" id="s-scope-active" checked style="width:auto;"> <span data-i18n="labelScopeActive"></span>
     </label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+    <label class="scope-label" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;">
       <input type="checkbox" id="s-scope-retired" style="width:auto;"> <span data-i18n="labelScopeRetired"></span>
     </label>
-    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+    <label class="scope-label" style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;">
       <input type="checkbox" id="s-scope-firstteam" style="width:auto;"> <span data-i18n="labelScopeFirstTeam"></span>
     </label>
   </div>
@@ -5675,7 +5682,7 @@ const I18N = {
     badgeSnapshot: 'תמונת מצב: 27.9.2026',
     badgeSeason: 'סגל האקדמיה: עונת 2026/27',
     badgeIndependent: 'עצמאי · לא קשור ל־FC Barcelona',
-    tabPlayers: 'שחקנים', tabSquad: 'בונה מערך', tabMatch: 'משחק',
+    tabPlayers: 'שחקנים', tabSquad: 'בונה מערך', tabMatch: 'טורניר',
     searchPlaceholder: 'חיפוש חופשי: שם שחקן או מועדון',
     optAllGroups: 'כל הקבוצות', groupGraduate: 'בוגרים', groupAtletic: 'בארסה אתלטיק',
     groupJuvenilA: 'נוער א׳', groupJuvenilB: 'נוער ב׳', groupFirstTeam: 'קבוצה ראשונה (חתימות)',
@@ -5778,7 +5785,7 @@ const I18N = {
     badgeSnapshot: 'Snapshot: Sep 27, 2026',
     badgeSeason: 'Academy squad: 2026/27 season',
     badgeIndependent: 'Independent · Not affiliated with FC Barcelona',
-    tabPlayers: 'Players', tabSquad: 'Squad Builder', tabMatch: 'Match',
+    tabPlayers: 'Players', tabSquad: 'Squad Builder', tabMatch: 'Tournament',
     searchPlaceholder: 'Free search: player name or club',
     optAllGroups: 'All groups', groupGraduate: 'Graduates', groupAtletic: 'Barça Atlètic',
     groupJuvenilA: 'Juvenil A', groupJuvenilB: 'Juvenil B', groupFirstTeam: 'First team (signings)',
@@ -5995,8 +6002,12 @@ function getFilteredPlayers() {
   const scopeActive = document.getElementById('f-scope-active').checked;
   const scopeRetired = document.getElementById('f-scope-retired').checked;
   const scopeFirstTeam = document.getElementById('f-scope-firstteam').checked;
+  // an explicit status (e.g. "retired") or an explicit first-team group
+  // selection is a direct request to see that category — it should always
+  // win over the broader default scope checkboxes, not be blocked by them.
+  const scopeBypassed = !!status || group === 'firstTeam';
   return PLAYERS.filter(p => {
-    if (!passesScopeFilter(p, scopeActive, scopeRetired, scopeFirstTeam)) return false;
+    if (!scopeBypassed && !passesScopeFilter(p, scopeActive, scopeRetired, scopeFirstTeam)) return false;
     if (q && !(p.nameHe.toLowerCase().includes(q) || (p.nameEn && p.nameEn.toLowerCase().includes(q)) || (p.currentClub||'').toLowerCase().includes(q))) return false;
     if (group && p.group !== group) return false;
     if (pos && !p.positions.includes(pos)) return false;
