@@ -215,10 +215,13 @@
       <option value="" data-i18n="optAllLeagues"></option>
     </select>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
-      <input type="checkbox" id="f-include-retired" style="width:auto;"> <span data-i18n="labelIncludeRetired"></span>
+      <input type="checkbox" id="f-scope-active" checked style="width:auto;"> <span data-i18n="labelScopeActive"></span>
     </label>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
-      <input type="checkbox" id="f-include-firstteam" style="width:auto;"> <span data-i18n="labelIncludeFirstTeam"></span>
+      <input type="checkbox" id="f-scope-retired" style="width:auto;"> <span data-i18n="labelScopeRetired"></span>
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+      <input type="checkbox" id="f-scope-firstteam" style="width:auto;"> <span data-i18n="labelScopeFirstTeam"></span>
     </label>
   </div>
   <div class="result-count" id="result-count"></div>
@@ -230,6 +233,17 @@
     <button data-f="433" class="active">4-3-3</button>
     <button data-f="4231">4-2-3-1</button>
     <button data-f="442">4-4-2</button>
+  </div>
+  <div class="filters" style="margin-bottom:8px;">
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+      <input type="checkbox" id="s-scope-active" checked style="width:auto;"> <span data-i18n="labelScopeActive"></span>
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+      <input type="checkbox" id="s-scope-retired" style="width:auto;"> <span data-i18n="labelScopeRetired"></span>
+    </label>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
+      <input type="checkbox" id="s-scope-firstteam" style="width:auto;"> <span data-i18n="labelScopeFirstTeam"></span>
+    </label>
   </div>
   <div id="pitch"></div>
   <div class="squad-actions">
@@ -274,13 +288,13 @@
   <div class="squad-actions">
     <button id="btn-sim-match" class="primary" data-i18n="btnSimMatch"></button>
   </div>
-  <div class="squad-actions" style="margin-top:6px;">
-    <button id="btn-season-start" data-i18n="btnSeasonStart"></button>
-    <button id="btn-season-play" class="primary" data-i18n="btnSeasonPlay"></button>
-    <button id="btn-season-reset" data-i18n="btnSeasonReset"></button>
-  </div>
-  <div id="season-status"></div>
   <div id="match-result"></div>
+
+  <div class="match-team-box" style="margin-top:18px;">
+    <div class="match-team-title" data-i18n="tournamentTitle"></div>
+    <div id="tournament-setup"></div>
+    <div id="tournament-view"></div>
+  </div>
 </section>
 
 </main>
@@ -291,7 +305,7 @@
 
 <div id="toast"></div>
 
-<footer data-i18n="footerText"></footer>
+<footer><span data-i18n="footerText"></span> · <span id="dev-link" data-i18n="devLinkLabel" style="cursor:pointer;text-decoration:underline;"></span></footer>
 
 <script>
 const PLAYERS = [
@@ -5617,6 +5631,12 @@ PLAYERS.forEach(p => {
   CURRENT_POTENTIAL[p.id] = (p.potential != null) ? p.potential : randomPotential();
 });
 
+// full history of potential changes per player, for the developers view only —
+// never shown to a regular user. index 0 is always the starting value.
+const POTENTIAL_HISTORY = {};
+PLAYERS.forEach(p => { POTENTIAL_HISTORY[p.id] = [{ match: 0, value: CURRENT_POTENTIAL[p.id] }]; });
+let globalMatchIndex = 0;
+
 function basePotential(p) { return (p && CURRENT_POTENTIAL[p.id] != null) ? CURRENT_POTENTIAL[p.id] : 4; }
 
 // academy players who have not yet been promoted to the senior squad carry a
@@ -5667,6 +5687,7 @@ const I18N = {
     optAllLeagues: 'כל הליגות',
     labelIncludeRetired: 'הצג גם שחקנים שפרשו',
     labelIncludeFirstTeam: 'הצג גם שחקני קבוצה ראשונה שלא מלה מאסיה',
+    labelScopeActive: 'לה מאסיה — שחקנים פעילים', labelScopeRetired: 'לה מאסיה — שחקנים שפרשו', labelScopeFirstTeam: 'קבוצה ראשונה (חתימות מחוץ ללה מאסיה)',
     resultCount: (n, total) => `${n} שחקנים מוצגים מתוך ${total}`,
     btnClearSquad: 'אפס מערך',
     btnRandomUnused: 'מלא אקראית — שחקנים שלא נבחרו עדיין',
@@ -5682,6 +5703,39 @@ const I18N = {
     btnSeasonPlay: 'שחק משחק נוסף בסדרה',
     btnSeasonReset: 'אפס סדרה (חזרה לפוטנציאלים המקוריים)',
     footerText: 'לה מאסיה טרקר — מסמך תיעוד עצמאי · לא קשור ל־FC Barcelona · נוצר 27.9.2026',
+    devLinkLabel: 'מפתחים',
+    devPanelTitle: 'פאנל מפתחים — פוטנציאל שחקנים',
+    devSearchPlaceholder: 'חיפוש שם שחקן',
+    devHistoryLabel: 'התקדמות פוטנציאל:',
+    devPasswordPrompt: 'הכנס סיסמה',
+    devWrongPassword: 'סיסמה שגויה',
+    tournamentTitle: 'טורניר',
+    tournamentNeedTeams: 'אין עדיין קבוצות שמורות. בנו קבוצות בטאב "בונה מערך" לפני יצירת טורניר.',
+    formatRoundRobin: 'מסלול ליגה (כל הקבוצות נגד כל הקבוצות)',
+    formatKnockout: 'מסלול נוקאאוט (הפסד = החוצה)',
+    btnCreateTournament: 'צור טורניר',
+    tournamentNeedTwoPlus: 'יש לבחור לפחות שתי קבוצות',
+    tournamentCreated: 'הטורניר נוצר בהצלחה',
+    tournamentProgress: (played, total) => `משחקים ששוחקו: ${played} מתוך ${total}`,
+    btnPlayNextFixture: (a, b) => `שחק את המשחק הבא: ${a} נגד ${b}`,
+    tournamentFinished: 'הטורניר הסתיים',
+    btnResetTournament: 'אפס טורניר',
+    standingsHeader: 'טבלת דירוג',
+    ptsAbbrev: 'נק׳',
+    wAbbrev: 'נ',
+    dAbbrev: 'ש',
+    lAbbrev: 'ה',
+    fixturesHeader: 'לוח משחקים',
+    vsLabel: 'נגד',
+    bracketHeader: 'תרשים נוקאאוט',
+    roundLabel: (n) => `שלב ${n}`,
+    tbdLabel: 'עדיין לא נקבע',
+    byeLabel: 'מעבר אוטומטי',
+    recentMatchesLabel: 'משחקים אחרונים',
+    passAccLabel: 'דיוק מסירות:',
+    shotsLabel: 'בעיטות:',
+    tacklesLabel: 'תפוסים:',
+
     emptyHint: 'לא נבחרה קבוצה. עברו לטאב "בונה מערך", בנו הרכב מלא (ידנית או אקראית) ושמרו אותו בשם.',
     matchTeam1Default: 'קבוצה 1', matchTeam2Default: 'קבוצה 2',
     selectTeamPlaceholder: '— בחר קבוצה —',
@@ -5736,6 +5790,7 @@ const I18N = {
     optAllLeagues: 'All leagues',
     labelIncludeRetired: 'Also show retired players',
     labelIncludeFirstTeam: 'Also show first-team players not from La Masia',
+    labelScopeActive: 'La Masia — active players', labelScopeRetired: 'La Masia — retired players', labelScopeFirstTeam: 'First team (signings outside La Masia)',
     resultCount: (n, total) => `Showing ${n} of ${total} players`,
     btnClearSquad: 'Clear lineup',
     btnRandomUnused: 'Random fill — players not selected yet',
@@ -5751,6 +5806,39 @@ const I18N = {
     btnSeasonPlay: 'Play another match in the series',
     btnSeasonReset: 'Reset series (back to original potentials)',
     footerText: 'La Masia Tracker — independent fan project · Not affiliated with FC Barcelona · created 27 Sep 2026',
+    devLinkLabel: 'Developers',
+    devPanelTitle: 'Developers panel — player potential',
+    devSearchPlaceholder: 'Search player name',
+    devHistoryLabel: 'Potential progression:',
+    devPasswordPrompt: 'Enter password',
+    devWrongPassword: 'Wrong password',
+    tournamentTitle: 'Tournament',
+    tournamentNeedTeams: 'No saved teams yet. Build teams in the "Squad Builder" tab before creating a tournament.',
+    formatRoundRobin: 'League format (everyone plays everyone)',
+    formatKnockout: 'Knockout format (lose = eliminated)',
+    btnCreateTournament: 'Create tournament',
+    tournamentNeedTwoPlus: 'Please select at least two teams',
+    tournamentCreated: 'Tournament created successfully',
+    tournamentProgress: (played, total) => `Matches played: ${played} of ${total}`,
+    btnPlayNextFixture: (a, b) => `Play next match: ${a} vs ${b}`,
+    tournamentFinished: 'Tournament finished',
+    btnResetTournament: 'Reset tournament',
+    standingsHeader: 'Standings',
+    ptsAbbrev: 'Pts',
+    wAbbrev: 'W',
+    dAbbrev: 'D',
+    lAbbrev: 'L',
+    fixturesHeader: 'Fixtures',
+    vsLabel: 'vs',
+    bracketHeader: 'Knockout bracket',
+    roundLabel: (n) => `Round ${n}`,
+    tbdLabel: 'TBD',
+    byeLabel: 'bye',
+    recentMatchesLabel: 'Recent matches',
+    passAccLabel: 'Pass accuracy:',
+    shotsLabel: 'Shots:',
+    tacklesLabel: 'Tackles:',
+
     emptyHint: 'No team selected. Go to the "Squad Builder" tab, build a full lineup (manually or randomly) and save it under a name.',
     matchTeam1Default: 'Team 1', matchTeam2Default: 'Team 2',
     selectTeamPlaceholder: '— choose a team —',
@@ -5874,7 +5962,7 @@ function switchTab(name) {
   document.getElementById('view-players').classList.toggle('hidden', name!=='players');
   document.getElementById('view-squad').classList.toggle('hidden', name!=='squad');
   document.getElementById('view-match').classList.toggle('hidden', name!=='match');
-  if (name === 'match') renderMatchTeams();
+  if (name === 'match') { renderMatchTeams(); renderTournamentSetup(); renderTournamentView(); }
 }
 
 // ---------- players list / filters ----------
@@ -5888,17 +5976,27 @@ function populateLeagueFilter() {
   });
 }
 
+// A player belongs to exactly one scope bucket: La Masia active, La Masia retired,
+// or first team (signings from outside La Masia). This lets any combination of the
+// three scope checkboxes be selected (only La Masia, only first team, both, only
+// retired, none at all, etc.) instead of the old "always show La Masia + add extras" logic.
+function passesScopeFilter(p, scopeActive, scopeRetired, scopeFirstTeam) {
+  if (p.group === 'firstTeam') return scopeFirstTeam;
+  if (p.careerStatus === 'retired') return scopeRetired;
+  return scopeActive;
+}
+
 function getFilteredPlayers() {
   const q = document.getElementById('f-search').value.trim().toLowerCase();
   const group = document.getElementById('f-group').value;
   const pos = document.getElementById('f-position').value;
   const status = document.getElementById('f-status').value;
   const league = document.getElementById('f-league').value;
-  const includeRetired = document.getElementById('f-include-retired').checked;
-  const includeFirstTeam = document.getElementById('f-include-firstteam').checked;
+  const scopeActive = document.getElementById('f-scope-active').checked;
+  const scopeRetired = document.getElementById('f-scope-retired').checked;
+  const scopeFirstTeam = document.getElementById('f-scope-firstteam').checked;
   return PLAYERS.filter(p => {
-    if (p.careerStatus === 'retired' && !includeRetired && status !== 'retired') return false;
-    if (p.group === 'firstTeam' && !includeFirstTeam && group !== 'firstTeam') return false;
+    if (!passesScopeFilter(p, scopeActive, scopeRetired, scopeFirstTeam)) return false;
     if (q && !(p.nameHe.toLowerCase().includes(q) || (p.nameEn && p.nameEn.toLowerCase().includes(q)) || (p.currentClub||'').toLowerCase().includes(q))) return false;
     if (group && p.group !== group) return false;
     if (pos && !p.positions.includes(pos)) return false;
@@ -5926,7 +6024,7 @@ function renderPlayersGrid() {
   });
 }
 
-['f-search','f-group','f-position','f-status','f-league','f-include-retired','f-include-firstteam'].forEach(id => {
+['f-search','f-group','f-position','f-status','f-league','f-scope-active','f-scope-retired','f-scope-firstteam'].forEach(id => {
   document.getElementById(id).addEventListener('input', renderPlayersGrid);
   document.getElementById(id).addEventListener('change', renderPlayersGrid);
 });
@@ -5963,19 +6061,44 @@ function openPlayerModal(id) {
       <a href="${p.mainSource}" target="_blank">${p.mainSource}</a>
       ${(p.extraSources||[]).map(s=>`<a href="${s}" target="_blank">${s}</a>`).join('')}
     </div>
-    <div class="potential-box">
-      <div class="label">${t('potentialLabel')}</div>
-      <div class="potential-stars" id="potential-stars"></div>
-    </div>
+    ${renderRecentMatchesTable(p)}
   `;
-  renderPotentialStars(p);
   overlay.style.display = 'flex';
+}
+
+// simulated recent-match stats (goals/assists/rating/pass accuracy/shots/tackles),
+// generated by this app's own fictional match engine — not a claim about the
+// real player, same as the rest of the simulated gameplay in this app.
+function renderRecentMatchesTable(p) {
+  const log = MATCH_LOG[p.id];
+  if (!log || !log.length) return '';
+  const rows = log.slice().reverse().map(m => `
+    <div class="event-row" style="display:flex;gap:10px;flex-wrap:wrap;">
+      <span style="color:#8fa89c;">${t('vsLabel')} ${m.opponent}</span>
+      <span style="color:${m.rating>=7?'#7fd9ad':m.rating>=5?'#e9c46a':'#e07a5f'};font-weight:bold;">${m.rating.toFixed(1)}</span>
+      <span>⚽ ${m.goals}</span>
+      <span>🅰️ ${m.assists}</span>
+      <span>${t('passAccLabel')} ${m.passAcc}%</span>
+      <span>${t('shotsLabel')} ${m.shots}</span>
+      <span>${t('tacklesLabel')} ${m.tackles}</span>
+    </div>`).join('');
+  return `<div class="field"><div class="label">${t('recentMatchesLabel')}</div><div class="match-team-list">${rows}</div></div>`;
 }
 function closePlayerModal() { document.getElementById('modal-overlay').style.display = 'none'; }
 document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target.id==='modal-overlay') closePlayerModal(); });
+// single delegated listener: clicking any player name (in team lists, ratings
+// tables, dev panel, etc.) opens that player's page — added once here rather
+// than re-wired after every innerHTML re-render.
+document.addEventListener('click', (e) => {
+  const link = e.target && e.target.closest ? e.target.closest('.player-link') : null;
+  if (link && link.dataset && link.dataset.playerId) openPlayerModal(link.dataset.playerId);
+});
 
-function renderPotentialStars(p) {
-  const el = document.getElementById('potential-stars');
+// developers-only widget: lets a developer view/edit a player's raw potential
+// and see it plotted against the effective (in-match) value. Never rendered
+// in any screen a regular user can reach.
+function renderPotentialStars(p, elId) {
+  const el = document.getElementById(elId || 'potential-stars');
   el.innerHTML = '';
   const cur = CURRENT_POTENTIAL[p.id];
   for (let i=1;i<=10;i++) {
@@ -5994,7 +6117,7 @@ function renderPotentialStars(p) {
     btn.style.fontWeight = 'bold';
     btn.style.background = active ? '#e9c46a' : '#243530';
     btn.style.color = active ? '#1a2a24' : '#8fa89c';
-    btn.onclick = () => { CURRENT_POTENTIAL[p.id] = i; renderPotentialStars(p); };
+    btn.onclick = () => { CURRENT_POTENTIAL[p.id] = i; renderPotentialStars(p, elId); };
     el.appendChild(btn);
   }
   const valueLabel = document.createElement('span');
@@ -6011,9 +6134,57 @@ function renderPotentialStars(p) {
   const clear = document.createElement('span');
   clear.textContent = t('clearLabel');
   clear.style.fontSize = '11px'; clear.style.color = '#8fa89c'; clear.style.cursor = 'pointer';
-  clear.onclick = () => { CURRENT_POTENTIAL[p.id] = null; renderPotentialStars(p); };
+  clear.onclick = () => { CURRENT_POTENTIAL[p.id] = null; renderPotentialStars(p, elId); };
   el.appendChild(clear);
 }
+
+// ---------- developers panel (password-gated, hidden from normal use) ----------
+const DEV_PASSWORD = '1989';
+let devUnlocked = false;
+
+function historyString(p) {
+  const hist = POTENTIAL_HISTORY[p.id] || [];
+  return hist.map(h => `${h.match}:${h.value.toFixed(2)}`).join(' → ');
+}
+
+function renderDevPanel(filterText) {
+  const overlay = document.getElementById('modal-overlay');
+  const modal = document.getElementById('modal');
+  const q = (filterText || '').trim().toLowerCase();
+  const list = PLAYERS.filter(p => !q || p.nameHe.toLowerCase().includes(q) || (p.nameEn && p.nameEn.toLowerCase().includes(q)));
+  modal.innerHTML = `
+    <button class="closeBtn" onclick="closePlayerModal()">✕</button>
+    <h2>${t('devPanelTitle')}</h2>
+    <input id="dev-search" type="text" data-i18n-ph="devSearchPlaceholder" placeholder="${t('devSearchPlaceholder')}" style="width:100%;margin-bottom:10px;">
+    <div id="dev-list"></div>
+  `;
+  document.getElementById('dev-search').value = filterText || '';
+  document.getElementById('dev-search').addEventListener('input', (e) => renderDevPanel(e.target.value));
+  const listEl = document.getElementById('dev-list');
+  listEl.innerHTML = list.map(p => `
+    <div class="field" data-dev-id="${p.id}" style="border-bottom:1px solid #2d4038;padding-bottom:8px;margin-bottom:8px;">
+      <div class="label">${displayName(p)} · ${GROUP_LABEL(p.group)}</div>
+      <div class="potential-stars" id="dev-stars-${p.id}"></div>
+      <div style="font-size:11px;color:#8fa89c;margin-top:4px;">${t('devHistoryLabel')} ${historyString(p)}</div>
+    </div>
+  `).join('');
+  list.forEach(p => renderPotentialStars(p, 'dev-stars-' + p.id));
+  overlay.style.display = 'flex';
+}
+
+function openDevPanel() {
+  if (!devUnlocked) {
+    const entered = window.prompt(t('devPasswordPrompt'));
+    if (entered !== DEV_PASSWORD) {
+      if (entered !== null) showToast(t('devWrongPassword'))();
+      return;
+    }
+    devUnlocked = true;
+  }
+  renderDevPanel('');
+}
+
+document.getElementById('dev-link').addEventListener('click', openDevPanel);
 
 // ---------- squad builder ----------
 document.querySelectorAll('.formations button').forEach(btn => {
@@ -6063,11 +6234,18 @@ function openPicker(slot) {
   document.getElementById('picker-panel').scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
+function squadScopeFilter() {
+  const scopeActive = document.getElementById('s-scope-active').checked;
+  const scopeRetired = document.getElementById('s-scope-retired').checked;
+  const scopeFirstTeam = document.getElementById('s-scope-firstteam').checked;
+  return p => passesScopeFilter(p, scopeActive, scopeRetired, scopeFirstTeam);
+}
+
 function renderPickerList(slot) {
   const showAll = document.getElementById('picker-show-all').checked;
   const q = document.getElementById('picker-search').value.trim().toLowerCase();
   const usedIds = new Set(Object.values(squad));
-  let list = PLAYERS.filter(p => showAll || p.positions.includes(slot.pos));
+  let list = PLAYERS.filter(squadScopeFilter()).filter(p => showAll || p.positions.includes(slot.pos));
   if (q) list = list.filter(p => p.nameHe.toLowerCase().includes(q) || (p.nameEn && p.nameEn.toLowerCase().includes(q)));
   const listEl = document.getElementById('picker-list');
   listEl.innerHTML = '';
@@ -6092,6 +6270,11 @@ function renderPickerList(slot) {
 }
 document.getElementById('picker-show-all').addEventListener('change', () => renderPickerList(FORMATIONS[currentFormationKey].find(s=>s.id===activeSlotId)));
 document.getElementById('picker-search').addEventListener('input', () => renderPickerList(FORMATIONS[currentFormationKey].find(s=>s.id===activeSlotId)));
+['s-scope-active','s-scope-retired','s-scope-firstteam'].forEach(id => {
+  document.getElementById(id).addEventListener('change', () => {
+    if (activeSlotId) renderPickerList(FORMATIONS[currentFormationKey].find(s=>s.id===activeSlotId));
+  });
+});
 
 document.getElementById('btn-clear-squad').onclick = () => {
   squad = {}; activeSlotId = null; renderPitch();
@@ -6170,6 +6353,7 @@ function renderSavedTeamsList() {
       renderSavedTeamsList();
     };
   });
+  if (typeof renderTournamentSetup === 'function' && !tournament) renderTournamentSetup();
 }
 
 // ---------- random team builder ----------
@@ -6183,7 +6367,7 @@ function randomFillSquad(restrictToUnused) {
   const slots = FORMATIONS[currentFormationKey];
   const globallyUsed = restrictToUnused ? getUsedPlayerIds() : new Set();
   const localUsed = new Set();
-  const pool = PLAYERS.filter(p => p.careerStatus !== 'retired');
+  const pool = PLAYERS.filter(squadScopeFilter());
   squad = {};
   let skipped = 0;
   slots.forEach(slot => {
@@ -6216,7 +6400,7 @@ function renderTeamList(team, elId) {
   const slots = FORMATIONS[team.formationKey];
   el.innerHTML = slots.map(slot => {
     const p = team.squad[slot.id] ? playerById(team.squad[slot.id]) : null;
-    return `<div>${POS_LABEL(slot.pos)}: <b>${p ? displayName(p) : '—'}</b></div>`;
+    return `<div>${POS_LABEL(slot.pos)}: <b>${p ? `<span class="player-link" data-player-id="${p.id}" style="cursor:pointer;text-decoration:underline;">${displayName(p)}</span>` : '—'}</b></div>`;
   }).join('');
 }
 
@@ -6351,7 +6535,21 @@ function simulateMatch(teamA, teamB) {
   return { goalsA, goalsB, ratingsA, ratingsB, events, ratingsTable };
 }
 
+let globalLogIndex = 0;
+const MATCH_LOG = {}; // playerId -> [{index, opponent, goals, assists, rating, passAcc, shots, tackles}], newest last
+
+function logPlayerMatch(p, opponentName, rating, goals, assists, isAttackPos, isDefPos) {
+  const clamp = (v,lo,hi) => Math.max(lo, Math.min(hi, v));
+  const passAcc = Math.round(clamp(65 + (rating - 6) * 7 + (Math.random() * 6 - 3), 45, 99));
+  const shots = isAttackPos ? Math.max(0, Math.round(Math.random() * 3 + (rating - 5) * 0.5)) : (Math.random() < 0.15 ? 1 : 0);
+  const tackles = isDefPos ? Math.max(0, Math.round(Math.random() * 3 + (rating - 5) * 0.4)) : Math.max(0, Math.round(Math.random() * 1.2));
+  if (!MATCH_LOG[p.id]) MATCH_LOG[p.id] = [];
+  MATCH_LOG[p.id].push({ index: globalLogIndex, opponent: opponentName, goals, assists, rating, passAcc, shots, tackles });
+  if (MATCH_LOG[p.id].length > 15) MATCH_LOG[p.id].shift();
+}
+
 function computeMatchRatings(teamA, teamB, events, goalsA, goalsB) {
+  globalLogIndex++;
   const goalsBy = {}, assistsBy = {};
   events.forEach(e => {
     if (e.scorer) goalsBy[e.scorer.id] = (goalsBy[e.scorer.id]||0) + 1;
@@ -6365,21 +6563,24 @@ function computeMatchRatings(teamA, teamB, events, goalsA, goalsB) {
     if (isDefensivePos && goalsAgainst === 0) score += 0.6;
     return Math.max(1, Math.min(10, Math.round(score*10)/10));
   }
-  function rateTeam(team, goalsFor, goalsAgainst) {
+  function rateTeam(team, goalsFor, goalsAgainst, opponentName) {
     const slots = FORMATIONS[team.formationKey];
     return slots.map(slot => {
       const pid = team.squad[slot.id];
       const p = pid ? playerById(pid) : null;
       if (!p) return null;
       const isDef = (DEFENSE_WEIGHTS[slot.pos] || 0) >= 0.4;
-      return { pos: slot.pos, p, rating: ratePlayer(p, goalsFor, goalsAgainst, isDef) };
+      const isAtt = (ATTACK_WEIGHTS[slot.pos] || 0) >= 0.4;
+      const rating = ratePlayer(p, goalsFor, goalsAgainst, isDef);
+      logPlayerMatch(p, opponentName, rating, goalsBy[p.id] || 0, assistsBy[p.id] || 0, isAtt, isDef);
+      return { pos: slot.pos, p, rating };
     }).filter(Boolean);
   }
-  return { a: rateTeam(teamA, goalsA, goalsB), b: rateTeam(teamB, goalsB, goalsA) };
+  return { a: rateTeam(teamA, goalsA, goalsB, teamB.name), b: rateTeam(teamB, goalsB, goalsA, teamA.name) };
 }
 
 function renderRatingsTable(list) {
-  return list.map(r => `<div class="event-row">${POS_LABEL(r.pos)}: <b>${displayName(r.p)}</b> — <span style="color:${r.rating>=7?'#7fd9ad':r.rating>=5?'#e9c46a':'#e07a5f'}">${r.rating.toFixed(1)}</span></div>`).join('');
+  return list.map(r => `<div class="event-row">${POS_LABEL(r.pos)}: <b><span class="player-link" data-player-id="${r.p.id}" style="cursor:pointer;text-decoration:underline;">${displayName(r.p)}</span></b> — <span style="color:${r.rating>=7?'#7fd9ad':r.rating>=5?'#e9c46a':'#e07a5f'}">${r.rating.toFixed(1)}</span></div>`).join('');
 }
 
 function renderMatchResult(result) {
@@ -6426,15 +6627,13 @@ document.getElementById('btn-sim-match').onclick = () => {
   renderMatchResult(result);
 };
 
-// ---------- season mode: potentials evolve match after match ----------
-let seasonActive = false;
-let seasonMatchCount = 0;
+// ---------- match development: potentials evolve match after match ----------
 
 // how much a player's potential can move after a single match, and in which
 // direction: young/academy players move fastest, prime-age players slower,
 // veterans slowest of all — and veterans (except Messi) drift down over time
 // even on a good day. everything is rounded to a fine 0.05 resolution.
-function developmentStep(p, rating) {
+function developmentStep(p, rating, currentPotential) {
   const age = p.age || 22;
   let speed;
   if (p.careerStatus === 'academy') speed = 0.30;
@@ -6448,21 +6647,32 @@ function developmentStep(p, rating) {
     delta -= 0.05;
   }
 
+  // the higher a player's current potential already is, the smaller any further
+  // rise can be (a player near the ceiling has far less room to grow than one who
+  // is still far from it). this headroom effect only softens growth, never decline.
+  if (delta > 0 && currentPotential != null) {
+    const headroom = Math.max(0.1, Math.min(1, (10 - currentPotential) / 9));
+    delta *= headroom;
+  }
+
   delta = Math.round(delta / 0.05) * 0.05;
   return delta;
 }
 
 function applyPostMatchDevelopment(teamA, teamB, result) {
   const changes = [];
+  globalMatchIndex++;
   function processTeam(ratingsRows) {
     ratingsRows.forEach(row => {
       const p = row.p;
-      const delta = developmentStep(p, row.rating);
-      if (delta === 0) return;
       const before = CURRENT_POTENTIAL[p.id] != null ? CURRENT_POTENTIAL[p.id] : basePotential(p);
+      const delta = developmentStep(p, row.rating, before);
+      if (delta === 0) return;
       const after = Math.max(1, Math.min(10, Math.round((before + delta) * 100) / 100));
       if (after === before) return;
       CURRENT_POTENTIAL[p.id] = after;
+      if (!POTENTIAL_HISTORY[p.id]) POTENTIAL_HISTORY[p.id] = [{ match: 0, value: before }];
+      POTENTIAL_HISTORY[p.id].push({ match: globalMatchIndex, value: after });
       changes.push({ p, before, after, delta: after - before });
     });
   }
@@ -6472,49 +6682,185 @@ function applyPostMatchDevelopment(teamA, teamB, result) {
   return changes;
 }
 
-function renderSeasonStatus(changes) {
-  const el = document.getElementById('season-status');
-  if (!seasonActive && seasonMatchCount === 0) { el.innerHTML = ''; return; }
-  let html = `<div class="event-row"><b>${t('seasonStatusHeader', seasonMatchCount)}</b></div>`;
-  if (changes && changes.length) {
-    html += `<div class="match-team-box" style="margin-top:8px;"><div class="match-team-title">${t('seasonChangesHeader')}</div><div class="match-team-list">`;
-    html += changes.map(c => `<div>${displayName(c.p)}: ${c.before.toFixed(2)} ← ${c.after.toFixed(2)} (${c.delta>=0?'+':''}${c.delta.toFixed(2)})</div>`).join('');
-    html += '</div></div>';
-  } else if (changes) {
-    html += `<div class="event-row">${t('seasonNoChanges')}</div>`;
+// ---------- tournament mode: pre-defined fixtures, no manual team-by-team picking ----------
+let tournament = null; // { format:'roundrobin'|'knockout', teamNames:[...], fixtures:[...], rounds:[[fixtureIdx,...],...] }
+
+function roundRobinFixtures(teamNames) {
+  // classic single round-robin: every team plays every other team exactly once
+  const fixtures = [];
+  for (let i = 0; i < teamNames.length; i++) {
+    for (let j = i + 1; j < teamNames.length; j++) {
+      fixtures.push({ a: teamNames[i], b: teamNames[j], played: false, goalsA: null, goalsB: null, round: 0 });
+    }
   }
-  el.innerHTML = html;
+  return { fixtures, rounds: [fixtures.map((_, idx) => idx)] };
 }
 
-document.getElementById('btn-season-start').onclick = () => {
-  seasonActive = true;
-  seasonMatchCount = 0;
-  renderSeasonStatus(null);
-  showToast(t('seasonStartToast'))();
-};
-
-document.getElementById('btn-season-play').onclick = () => {
-  const teamA = selectedTeamAName ? findSavedTeam(selectedTeamAName) : null;
-  const teamB = selectedTeamBName ? findSavedTeam(selectedTeamBName) : null;
-  if (!teamA || !teamB) {
-    showToast(t('needTwoTeamsSeason'))();
-    return;
+function knockoutFixtures(teamNames) {
+  // pad with byes up to the next power of two; bye slots auto-advance their opponent
+  let size = 1;
+  while (size < teamNames.length) size *= 2;
+  const slots = teamNames.slice();
+  while (slots.length < size) slots.push(null); // null = bye
+  const fixtures = [];
+  const round0 = [];
+  for (let i = 0; i < slots.length; i += 2) {
+    const idx = fixtures.length;
+    fixtures.push({ a: slots[i], b: slots[i + 1], played: false, goalsA: null, goalsB: null, round: 0, nextFixture: null, nextSlot: null });
+    round0.push(idx);
   }
-  if (!seasonActive) { seasonActive = true; seasonMatchCount = 0; }
-  const result = simulateMatch(teamA, teamB);
-  seasonMatchCount++;
-  const changes = applyPostMatchDevelopment(teamA, teamB, result);
-  renderMatchResult(result);
-  renderSeasonStatus(changes);
-};
+  const rounds = [round0];
+  let prevRound = round0;
+  let roundNum = 1;
+  while (prevRound.length > 1) {
+    const nextRound = [];
+    for (let i = 0; i < prevRound.length; i += 2) {
+      const idx = fixtures.length;
+      fixtures.push({ a: null, b: null, played: false, goalsA: null, goalsB: null, round: roundNum, nextFixture: null, nextSlot: null });
+      fixtures[prevRound[i]].nextFixture = idx; fixtures[prevRound[i]].nextSlot = 'a';
+      fixtures[prevRound[i + 1]].nextFixture = idx; fixtures[prevRound[i + 1]].nextSlot = 'b';
+      nextRound.push(idx);
+    }
+    rounds.push(nextRound);
+    prevRound = nextRound;
+    roundNum++;
+  }
+  // resolve byes immediately (a fixture with one real team and one null auto-advances)
+  fixtures.forEach(f => {
+    if (f.round === 0 && (f.a === null) !== (f.b === null)) {
+      const winner = f.a === null ? f.b : f.a;
+      f.played = true; f.bye = true;
+      if (f.nextFixture != null) fixtures[f.nextFixture][f.nextSlot] = winner;
+    }
+  });
+  return { fixtures, rounds };
+}
 
-document.getElementById('btn-season-reset').onclick = () => {
-  PLAYERS.forEach(p => { CURRENT_POTENTIAL[p.id] = (p.potential != null) ? p.potential : randomPotential(); });
-  seasonActive = false;
-  seasonMatchCount = 0;
-  renderSeasonStatus(null);
-  showToast(t('seasonResetToast'))();
-};
+function winnerOf(f) {
+  if (f.bye) return f.a === null ? f.b : f.a;
+  if (!f.played) return null;
+  if (f.goalsA === f.goalsB) return Math.random() < 0.5 ? f.a : f.b; // sim penalty shootout, no extra state kept
+  return f.goalsA > f.goalsB ? f.a : f.b;
+}
+
+function nextUnplayedFixture() {
+  if (!tournament) return null;
+  return tournament.fixtures.find(f => !f.played && f.a && f.b) || null;
+}
+
+function computeStandings(teamNames, fixtures) {
+  const table = {};
+  teamNames.forEach(n => table[n] = { name: n, played: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0, pts: 0 });
+  fixtures.forEach(f => {
+    if (!f.played || f.bye || !f.a || !f.b) return;
+    const ta = table[f.a], tb = table[f.b];
+    ta.played++; tb.played++;
+    ta.gf += f.goalsA; ta.ga += f.goalsB;
+    tb.gf += f.goalsB; tb.ga += f.goalsA;
+    if (f.goalsA > f.goalsB) { ta.w++; ta.pts += 3; tb.l++; }
+    else if (f.goalsA < f.goalsB) { tb.w++; tb.pts += 3; ta.l++; }
+    else { ta.d++; tb.d++; ta.pts++; tb.pts++; }
+  });
+  return Object.values(table).sort((x, y) => y.pts - x.pts || (y.gf - y.ga) - (x.gf - x.ga) || y.gf - x.gf);
+}
+
+function renderTournamentSetup() {
+  const el = document.getElementById('tournament-setup');
+  const viewEl = document.getElementById('tournament-view');
+  if (tournament) { el.innerHTML = ''; return; }
+  viewEl.innerHTML = '';
+  if (!savedTeams.length) { el.innerHTML = `<div class="event-row">${t('tournamentNeedTeams')}</div>`; return; }
+  el.innerHTML = `
+    <div class="filters" style="margin:8px 0;">
+      <select id="tournament-format">
+        <option value="roundrobin">${t('formatRoundRobin')}</option>
+        <option value="knockout">${t('formatKnockout')}</option>
+      </select>
+    </div>
+    <div id="tournament-team-picks">
+      ${savedTeams.map(tm => `<label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;margin:4px 0;">
+        <input type="checkbox" class="tournament-team-cb" value="${tm.name}" style="width:auto;"> <span>${tm.name}</span>
+      </label>`).join('')}
+    </div>
+    <div class="squad-actions" style="margin-top:8px;">
+      <button id="btn-tournament-create" class="primary" data-i18n="btnCreateTournament"></button>
+    </div>
+  `;
+  document.getElementById('tournament-format').textContent; // noop, keep i18n static apply simple
+  document.getElementById('btn-tournament-create').textContent = t('btnCreateTournament');
+  document.getElementById('btn-tournament-create').onclick = () => {
+    const chosen = Array.from(document.querySelectorAll('.tournament-team-cb'))
+      .filter(cb => cb.checked).map(cb => cb.value);
+    if (chosen.length < 2) { showToast(t('tournamentNeedTwoPlus'))(); return; }
+    const format = document.getElementById('tournament-format').value;
+    const built = format === 'knockout' ? knockoutFixtures(chosen) : roundRobinFixtures(chosen);
+    tournament = { format, teamNames: chosen, fixtures: built.fixtures, rounds: built.rounds };
+    renderTournamentSetup();
+    renderTournamentView();
+    showToast(t('tournamentCreated'))();
+  };
+}
+
+function renderTournamentView() {
+  const el = document.getElementById('tournament-view');
+  if (!tournament) { el.innerHTML = ''; return; }
+  const totalReal = tournament.fixtures.filter(f => f.a && f.b).length;
+  const playedReal = tournament.fixtures.filter(f => f.played && f.a && f.b && !f.bye).length;
+  const next = nextUnplayedFixture();
+  let html = `<div class="event-row"><b>${t('tournamentProgress', playedReal, totalReal)}</b></div>`;
+  html += `<div class="squad-actions" style="margin:8px 0;">
+    <button id="btn-tournament-play" class="primary" ${next ? '' : 'disabled'}>${next ? t('btnPlayNextFixture', next.a, next.b) : t('tournamentFinished')}</button>
+    <button id="btn-tournament-reset">${t('btnResetTournament')}</button>
+  </div>`;
+  if (tournament.format === 'roundrobin') {
+    const standings = computeStandings(tournament.teamNames, tournament.fixtures);
+    html += `<div class="match-team-title">${t('standingsHeader')}</div><div class="match-team-list">`;
+    html += standings.map((s, i) => `<div>${i+1}. <b>${s.name}</b> — ${t('ptsAbbrev')} ${s.pts} (${s.w}${t('wAbbrev')} ${s.d}${t('dAbbrev')} ${s.l}${t('lAbbrev')}, ${s.gf}-${s.ga})</div>`).join('');
+    html += '</div>';
+    html += `<div class="match-team-title" style="margin-top:8px;">${t('fixturesHeader')}</div><div class="match-team-list">`;
+    html += tournament.fixtures.map(f => `<div>${f.a} ${f.played ? (f.goalsA + ' : ' + f.goalsB) : t('vsLabel')} ${f.b}</div>`).join('');
+    html += '</div>';
+  } else {
+    html += `<div class="match-team-title">${t('bracketHeader')}</div>`;
+    tournament.rounds.forEach((roundIdxs, ri) => {
+      html += `<div class="match-team-list"><div style="margin-top:6px;color:#7fd9ad;">${t('roundLabel', ri + 1)}</div>`;
+      html += roundIdxs.map(idx => {
+        const f = tournament.fixtures[idx];
+        const aLabel = f.a || t('tbdLabel');
+        const bLabel = f.b || t('tbdLabel');
+        const score = f.bye ? t('byeLabel') : (f.played ? `${f.goalsA} : ${f.goalsB}` : t('vsLabel'));
+        return `<div>${aLabel} ${score} ${bLabel}</div>`;
+      }).join('');
+      html += '</div>';
+    });
+  }
+  el.innerHTML = html;
+  const playBtn = document.getElementById('btn-tournament-play');
+  if (playBtn && next) {
+    playBtn.onclick = () => {
+      const teamA = findSavedTeam(next.a);
+      const teamB = findSavedTeam(next.b);
+      selectedTeamAName = next.a; selectedTeamBName = next.b;
+      renderMatchTeams();
+      const result = simulateMatch(teamA, teamB);
+      next.played = true; next.goalsA = result.goalsA; next.goalsB = result.goalsB;
+      if (tournament.format === 'knockout' && next.nextFixture != null) {
+        tournament.fixtures[next.nextFixture][next.nextSlot] = winnerOf(next);
+      }
+      applyPostMatchDevelopment(teamA, teamB, result);
+      renderMatchResult(result);
+      renderTournamentView();
+    };
+  }
+  const resetBtn = document.getElementById('btn-tournament-reset');
+  if (resetBtn) {
+    resetBtn.onclick = () => {
+      tournament = null;
+      renderTournamentSetup();
+      renderTournamentView();
+    };
+  }
+}
 
 // ---------- init ----------
 applyStaticI18n();
