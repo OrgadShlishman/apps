@@ -5744,6 +5744,15 @@ const I18N = {
     tournamentRandomCountInvalid: 'יש להזין מספר קבוצות תקין',
     tournamentNoMoreTeams: 'אין יותר קבוצות שמורות להוספה',
     tournamentRandomFilled: (n) => `נוספו ${n} קבוצות אקראיות`,
+    generateTeamsTitle: 'יצירת קבוצות אקראיות חדשות',
+    generateTeamsHint: 'בונה קבוצות מלאות חדשות משחקנים פנויים (שלא משמשים כבר בקבוצה שמורה אחרת), לפי רמת קושי:',
+    autoNameTeamsLabel: 'מספר קבוצות אוטומטית (קבוצה 1, קבוצה 2, ...)',
+    teamNamePlaceholder: (n) => `שם לקבוצה ${n}`,
+    autoTeamName: (n) => `קבוצה ${n}`,
+    btnGenerateTeams: 'צור קבוצות',
+    teamsGenerated: (n) => `נוצרו ${n} קבוצות חדשות ונבחרו לטורניר`,
+    teamsGeneratedPartial: (n) => `נוצרו ${n} קבוצות חדשות ונבחרו לטורניר (חלקן לא מלאות – אין מספיק שחקנים פנויים בפוזיציות מסוימות)`,
+    liveStatsTitle: 'סטטיסטיקות נוכחיות בטורניר',
     tournamentSummaryTitle: 'סיכום הטורניר',
     mvpLabel: 'שחקן מצטיין הטורניר',
     mvpBonusNote: 'הפוטנציאל שלו עלה ב-0.25',
@@ -5859,6 +5868,15 @@ const I18N = {
     tournamentRandomCountInvalid: 'Please enter a valid number of teams',
     tournamentNoMoreTeams: 'No more saved teams available to add',
     tournamentRandomFilled: (n) => `Added ${n} random teams`,
+    generateTeamsTitle: 'Generate new random teams',
+    generateTeamsHint: 'Builds brand-new full squads from available players (not already used by another saved team), biased by difficulty:',
+    autoNameTeamsLabel: 'Auto-number teams (Team 1, Team 2, ...)',
+    teamNamePlaceholder: (n) => `Name for team ${n}`,
+    autoTeamName: (n) => `Team ${n}`,
+    btnGenerateTeams: 'Generate teams',
+    teamsGenerated: (n) => `${n} new teams generated and added to the tournament selection`,
+    teamsGeneratedPartial: (n) => `${n} new teams generated and added to the tournament selection (some incomplete — not enough available players for certain positions)`,
+    liveStatsTitle: 'Current tournament stats',
     tournamentSummaryTitle: 'Tournament summary',
     mvpLabel: 'Player of the Tournament',
     mvpBonusNote: 'potential increased by 0.25',
@@ -6376,7 +6394,10 @@ document.getElementById('btn-save-team').onclick = () => {
   renderSavedTeamsList();
 };
 
-function renderSavedTeamsList() {
+// renders just the saved-teams chip list, without touching the tournament
+// setup panel (used when the caller is already managing tournament checkbox
+// state itself, e.g. right after generating new teams).
+function renderSavedTeamsListOnly() {
   const el = document.getElementById('saved-teams-list');
   if (!savedTeams.length) { el.textContent = t('noTeamsSaved'); return; }
   el.innerHTML = t('savedTeamsPrefix') + savedTeams.map(tm =>
@@ -6388,6 +6409,10 @@ function renderSavedTeamsList() {
       renderSavedTeamsList();
     };
   });
+}
+
+function renderSavedTeamsList() {
+  renderSavedTeamsListOnly();
   if (typeof renderTournamentSetup === 'function' && !tournament) renderTournamentSetup();
 }
 
@@ -6753,14 +6778,69 @@ function pickRandomTeamsByDifficulty(excludeNames, count, difficulty) {
   return weightedSampleWithoutReplacement(candidates, weights, count).map(tm => tm.name);
 }
 
+// builds one brand-new full squad (all slots of the currently active formation)
+// from players who are not in `excludeIds`, biased by difficulty the same way
+// pickRandomTeamsByDifficulty biases team picks: hard prefers high-potential
+// players per slot, easy prefers low-potential ones, medium is uniform.
+function generateRandomTeam(difficulty, excludeIds) {
+  const slots = FORMATIONS[currentFormationKey];
+  const localUsed = new Set(excludeIds);
+  const squadObj = {};
+  let skipped = 0;
+  slots.forEach(slot => {
+    const candidates = PLAYERS.filter(squadScopeFilter()).filter(p => p.positions.includes(slot.pos) && !localUsed.has(p.id));
+    if (!candidates.length) { skipped++; return; }
+    const strengths = candidates.map(p => effectivePotential(p));
+    let weights;
+    if (difficulty === 'hard') weights = strengths.map(s => Math.pow(Math.max(0.1, s), 3));
+    else if (difficulty === 'easy') weights = strengths.map(s => Math.pow(Math.max(0.1, 11 - s), 3));
+    else weights = strengths.map(() => 1);
+    const [pick] = weightedSampleWithoutReplacement(candidates, weights, 1);
+    squadObj[slot.id] = pick.id;
+    localUsed.add(pick.id);
+  });
+  return { squad: squadObj, formationKey: currentFormationKey, skipped };
+}
+
+function uniqueTeamName(base) {
+  let name = base, n = 2;
+  while (findSavedTeam(name)) { name = `${base} (${n})`; n++; }
+  return name;
+}
+
+// creates `count` brand-new saved teams, each a full random squad biased by
+// difficulty, and never sharing a player with an already-saved team (or with
+// another team generated in the same batch). `names[i]`, if non-empty, names
+// team i explicitly; otherwise it gets an auto-numbered name.
+function generateRandomTeams(count, difficulty, names) {
+  const excludeIds = new Set(getUsedPlayerIds());
+  const createdNames = [];
+  let autoIdx = savedTeams.length + 1;
+  let anySkipped = false;
+  for (let i = 0; i < count; i++) {
+    const built = generateRandomTeam(difficulty, excludeIds);
+    if (built.skipped > 0) anySkipped = true;
+    Object.values(built.squad).forEach(pid => excludeIds.add(pid));
+    const custom = names && names[i] && names[i].trim();
+    const base = custom || t('autoTeamName', autoIdx);
+    const name = uniqueTeamName(base);
+    savedTeams.push({ name, formationKey: built.formationKey, squad: built.squad });
+    createdNames.push(name);
+    autoIdx++;
+  }
+  return { createdNames, anySkipped };
+}
+
 let tournament = null; // { format:'roundrobin'|'knockout', teamNames:[...], fixtures:[...], rounds:[[fixtureIdx,...],...] }
 
 function roundRobinFixtures(teamNames) {
-  // classic single round-robin: every team plays every other team exactly once
+  // double round-robin, like a real league: every team plays every other team
+  // twice (once with each side as the nominal "home" side, i.e. a/b swapped).
   const fixtures = [];
   for (let i = 0; i < teamNames.length; i++) {
     for (let j = i + 1; j < teamNames.length; j++) {
-      fixtures.push({ a: teamNames[i], b: teamNames[j], played: false, goalsA: null, goalsB: null, round: 0 });
+      fixtures.push({ a: teamNames[i], b: teamNames[j], played: false, goalsA: null, goalsB: null, round: 0, leg: 1 });
+      fixtures.push({ a: teamNames[j], b: teamNames[i], played: false, goalsA: null, goalsB: null, round: 0, leg: 2 });
     }
   }
   return { fixtures, rounds: [fixtures.map((_, idx) => idx)] };
@@ -6839,7 +6919,11 @@ function renderTournamentSetup() {
   const viewEl = document.getElementById('tournament-view');
   if (tournament) { el.innerHTML = ''; return; }
   viewEl.innerHTML = '';
-  if (!savedTeams.length) { el.innerHTML = `<div class="event-row">${t('tournamentNeedTeams')}</div>`; return; }
+  const teamPicksHtml = savedTeams.length
+    ? savedTeams.map(tm => `<label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;margin:4px 0;">
+        <input type="checkbox" class="tournament-team-cb" value="${tm.name}" style="width:auto;"> <span>${tm.name}</span>
+      </label>`).join('')
+    : `<div class="event-row">${t('tournamentNeedTeams')}</div>`;
   el.innerHTML = `
     <div class="filters" style="margin:8px 0;">
       <select id="tournament-format">
@@ -6847,20 +6931,33 @@ function renderTournamentSetup() {
         <option value="knockout">${t('formatKnockout')}</option>
       </select>
     </div>
-    <div id="tournament-team-picks">
-      ${savedTeams.map(tm => `<label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;margin:4px 0;">
-        <input type="checkbox" class="tournament-team-cb" value="${tm.name}" style="width:auto;"> <span>${tm.name}</span>
-      </label>`).join('')}
-    </div>
+    <div id="tournament-team-picks">${teamPicksHtml}</div>
     <div style="font-size:12px;color:#8fa89c;margin:10px 0 4px;">${t('tournamentRandomFillHint')}</div>
     <div class="filters" style="margin-bottom:8px;">
-      <input id="tournament-random-count" type="number" min="1" max="${savedTeams.length}" value="3">
+      <input id="tournament-random-count" type="number" min="1" max="${Math.max(1, savedTeams.length)}" value="3">
       <select id="tournament-difficulty">
         <option value="easy">${t('difficultyEasy')}</option>
         <option value="medium" selected>${t('difficultyMedium')}</option>
         <option value="hard">${t('difficultyHard')}</option>
       </select>
       <button id="btn-tournament-random-fill">${t('btnRandomFillTeams')}</button>
+    </div>
+    <div class="match-team-title" style="margin-top:14px;">${t('generateTeamsTitle')}</div>
+    <div style="font-size:12px;color:#8fa89c;margin:4px 0;">${t('generateTeamsHint')}</div>
+    <div class="filters" style="margin-bottom:4px;">
+      <input id="tournament-gen-count" type="number" min="1" max="16" value="4">
+      <select id="tournament-gen-difficulty">
+        <option value="easy">${t('difficultyEasy')}</option>
+        <option value="medium" selected>${t('difficultyMedium')}</option>
+        <option value="hard">${t('difficultyHard')}</option>
+      </select>
+    </div>
+    <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;margin:4px 0;">
+      <input type="checkbox" id="tournament-gen-autoname" checked style="width:auto;"> <span>${t('autoNameTeamsLabel')}</span>
+    </label>
+    <div id="tournament-gen-names"></div>
+    <div class="squad-actions" style="margin:8px 0;">
+      <button id="btn-tournament-generate">${t('btnGenerateTeams')}</button>
     </div>
     <div class="squad-actions" style="margin-top:8px;">
       <button id="btn-tournament-create" class="primary" data-i18n="btnCreateTournament"></button>
@@ -6876,6 +6973,32 @@ function renderTournamentSetup() {
     if (!picks.length) { showToast(t('tournamentNoMoreTeams'))(); return; }
     document.querySelectorAll('.tournament-team-cb').forEach(cb => { if (picks.includes(cb.value)) cb.checked = true; });
     showToast(t('tournamentRandomFilled', picks.length))();
+  };
+  function renderGenNameInputs() {
+    const count = parseInt(document.getElementById('tournament-gen-count').value, 10) || 0;
+    const autoName = document.getElementById('tournament-gen-autoname').checked;
+    const namesEl = document.getElementById('tournament-gen-names');
+    if (autoName || count <= 0) { namesEl.innerHTML = ''; return; }
+    namesEl.innerHTML = Array.from({ length: count }, (_, i) =>
+      `<input class="tournament-gen-name-input" type="text" placeholder="${t('teamNamePlaceholder', i + 1)}" style="margin:3px 0;">`
+    ).join('');
+  }
+  document.getElementById('tournament-gen-count').addEventListener('input', renderGenNameInputs);
+  document.getElementById('tournament-gen-autoname').addEventListener('change', renderGenNameInputs);
+  renderGenNameInputs();
+  document.getElementById('btn-tournament-generate').onclick = () => {
+    const count = parseInt(document.getElementById('tournament-gen-count').value, 10) || 0;
+    if (count <= 0) { showToast(t('tournamentRandomCountInvalid'))(); return; }
+    const difficulty = document.getElementById('tournament-gen-difficulty').value;
+    const autoName = document.getElementById('tournament-gen-autoname').checked;
+    const names = autoName ? [] : Array.from(document.querySelectorAll('.tournament-gen-name-input')).map(inp => inp.value);
+    const previouslyChecked = Array.from(document.querySelectorAll('.tournament-team-cb')).filter(cb => cb.checked).map(cb => cb.value);
+    const { createdNames, anySkipped } = generateRandomTeams(count, difficulty, names);
+    renderTournamentSetup();
+    const toCheck = new Set([...previouslyChecked, ...createdNames]);
+    document.querySelectorAll('.tournament-team-cb').forEach(cb => { if (toCheck.has(cb.value)) cb.checked = true; });
+    renderSavedTeamsListOnly();
+    showToast(anySkipped ? t('teamsGeneratedPartial', createdNames.length) : t('teamsGenerated', createdNames.length))();
   };
   document.getElementById('btn-tournament-create').onclick = () => {
     const chosen = Array.from(document.querySelectorAll('.tournament-team-cb'))
@@ -6923,6 +7046,7 @@ function renderTournamentView() {
       html += '</div>';
     });
   }
+  if (next && Object.keys(tournament.stats).length) html += renderLiveTournamentStats();
   if (!next && totalReal > 0) html += renderTournamentSummary();
   el.innerHTML = html;
   const playBtn = document.getElementById('btn-tournament-play');
@@ -6991,6 +7115,43 @@ function awardMvpBonus(pid) {
   POTENTIAL_HISTORY[p.id].push({ match: globalMatchIndex, value: after });
 }
 
+// shared "top scorers / top assists" mini-tables, reused by both the live
+// in-progress stats panel and the final tournament summary.
+function playerLink(p) {
+  return `<span class="player-link" data-player-id="${p.id}" style="cursor:pointer;text-decoration:underline;">${displayName(p)}</span>`;
+}
+
+function renderTopScorersAssists(entries) {
+  const topScorers = entries.filter(e => e.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists).slice(0, 5);
+  const topAssists = entries.filter(e => e.assists > 0).sort((a, b) => b.assists - a.assists || b.goals - a.goals).slice(0, 5);
+  let html = '';
+  if (topScorers.length) {
+    html += `<div class="match-team-title" style="margin-top:8px;">${t('topScorersLabel')}</div><div class="match-team-list">`;
+    html += topScorers.map(e => `<div>${playerLink(playerById(e.pid))} — ⚽ ${e.goals} · 🅰️ ${e.assists} · ${e.avgRating.toFixed(1)}</div>`).join('');
+    html += '</div>';
+  }
+  if (topAssists.length) {
+    html += `<div class="match-team-title" style="margin-top:8px;">${t('topAssistsLabel')}</div><div class="match-team-list">`;
+    html += topAssists.map(e => `<div>${playerLink(playerById(e.pid))} — 🅰️ ${e.assists} · ⚽ ${e.goals} · ${e.avgRating.toFixed(1)}</div>`).join('');
+    html += '</div>';
+  }
+  return html;
+}
+
+// lightweight stats panel shown WHILE the tournament is still in progress
+// (top scorers/assists only — no MVP or team-of-the-tournament yet, those are
+// only meaningful once every fixture has been played).
+function renderLiveTournamentStats() {
+  const entries = Object.values(tournament.stats);
+  if (!entries.length) return '';
+  entries.forEach(e => { e.avgRating = e.count ? e.ratingSum / e.count : 0; });
+  let html = `<div class="match-team-box" style="margin-top:14px;border:1px solid #2d4038;">`;
+  html += `<div class="match-team-title">${t('liveStatsTitle')}</div>`;
+  html += renderTopScorersAssists(entries);
+  html += '</div>';
+  return html;
+}
+
 function renderTournamentSummary() {
   const entries = Object.values(tournament.stats);
   if (!entries.length) return '';
@@ -7006,8 +7167,6 @@ function renderTournamentSummary() {
     awardMvpBonus(mvp.pid);
   }
   const mvpP = tournament.mvpPid ? playerById(tournament.mvpPid) : null;
-  const topScorers = entries.filter(e => e.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists).slice(0, 5);
-  const topAssists = entries.filter(e => e.assists > 0).sort((a, b) => b.assists - a.assists || b.goals - a.goals).slice(0, 5);
   const slotsNeeded = FORMATIONS['433'].map(s => s.pos);
   const used = new Set();
   const bestXI = slotsNeeded.map(pos => {
@@ -7016,22 +7175,12 @@ function renderTournamentSummary() {
     used.add(candidates[0].pid);
     return { pos, p: playerById(candidates[0].pid), rating: candidates[0].avgRating };
   }).filter(Boolean);
-  const link = (p) => `<span class="player-link" data-player-id="${p.id}" style="cursor:pointer;text-decoration:underline;">${displayName(p)}</span>`;
   let html = `<div class="match-team-box" style="margin-top:14px;border:1px solid #e9c46a;">`;
   html += `<div class="match-team-title" style="color:#e9c46a;">${t('tournamentSummaryTitle')}</div>`;
-  if (mvpP) html += `<div class="event-row"><b>${t('mvpLabel')}</b>: ${link(mvpP)} (${t('mvpBonusNote')})</div>`;
-  if (topScorers.length) {
-    html += `<div class="match-team-title" style="margin-top:8px;">${t('topScorersLabel')}</div><div class="match-team-list">`;
-    html += topScorers.map(e => `<div>${link(playerById(e.pid))} — ⚽ ${e.goals} · 🅰️ ${e.assists} · ${e.avgRating.toFixed(1)}</div>`).join('');
-    html += '</div>';
-  }
-  if (topAssists.length) {
-    html += `<div class="match-team-title" style="margin-top:8px;">${t('topAssistsLabel')}</div><div class="match-team-list">`;
-    html += topAssists.map(e => `<div>${link(playerById(e.pid))} — 🅰️ ${e.assists} · ⚽ ${e.goals} · ${e.avgRating.toFixed(1)}</div>`).join('');
-    html += '</div>';
-  }
+  if (mvpP) html += `<div class="event-row"><b>${t('mvpLabel')}</b>: ${playerLink(mvpP)} (${t('mvpBonusNote')})</div>`;
+  html += renderTopScorersAssists(entries);
   html += `<div class="match-team-title" style="margin-top:8px;">${t('teamOfTournamentLabel')}</div><div class="match-team-list">`;
-  html += bestXI.map(slot => `<div>${POS_LABEL(slot.pos)}: ${link(slot.p)} — ${slot.rating.toFixed(2)}</div>`).join('');
+  html += bestXI.map(slot => `<div>${POS_LABEL(slot.pos)}: ${playerLink(slot.p)} — ${slot.rating.toFixed(2)}</div>`).join('');
   html += '</div></div>';
   return html;
 }
