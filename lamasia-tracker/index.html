@@ -5738,6 +5738,18 @@ const I18N = {
     roundLabel: (n) => `שלב ${n}`,
     tbdLabel: 'עדיין לא נקבע',
     byeLabel: 'מעבר אוטומטי',
+    tournamentRandomFillHint: 'ניתן לבחור קבוצות ידנית וגם להוסיף קבוצות אקראיות לפי רמת קושי:',
+    difficultyEasy: 'קלה', difficultyMedium: 'בינונית', difficultyHard: 'קשה',
+    btnRandomFillTeams: 'הוסף קבוצות אקראיות',
+    tournamentRandomCountInvalid: 'יש להזין מספר קבוצות תקין',
+    tournamentNoMoreTeams: 'אין יותר קבוצות שמורות להוספה',
+    tournamentRandomFilled: (n) => `נוספו ${n} קבוצות אקראיות`,
+    tournamentSummaryTitle: 'סיכום הטורניר',
+    mvpLabel: 'שחקן מצטיין הטורניר',
+    mvpBonusNote: 'הפוטנציאל שלו עלה ב-0.25',
+    topScorersLabel: 'מלכי השערים',
+    topAssistsLabel: 'מלכי הבישולים',
+    teamOfTournamentLabel: 'נבחרת הטורניר',
     recentMatchesLabel: 'משחקים אחרונים',
     passAccLabel: 'דיוק מסירות:',
     shotsLabel: 'בעיטות:',
@@ -5841,6 +5853,18 @@ const I18N = {
     roundLabel: (n) => `Round ${n}`,
     tbdLabel: 'TBD',
     byeLabel: 'bye',
+    tournamentRandomFillHint: 'You can pick teams manually and also add random teams by difficulty level:',
+    difficultyEasy: 'Easy', difficultyMedium: 'Medium', difficultyHard: 'Hard',
+    btnRandomFillTeams: 'Add random teams',
+    tournamentRandomCountInvalid: 'Please enter a valid number of teams',
+    tournamentNoMoreTeams: 'No more saved teams available to add',
+    tournamentRandomFilled: (n) => `Added ${n} random teams`,
+    tournamentSummaryTitle: 'Tournament summary',
+    mvpLabel: 'Player of the Tournament',
+    mvpBonusNote: 'potential increased by 0.25',
+    topScorersLabel: 'Top scorers',
+    topAssistsLabel: 'Top assists',
+    teamOfTournamentLabel: 'Team of the Tournament',
     recentMatchesLabel: 'Recent matches',
     passAccLabel: 'Pass accuracy:',
     shotsLabel: 'Shots:',
@@ -6694,6 +6718,41 @@ function applyPostMatchDevelopment(teamA, teamB, result) {
 }
 
 // ---------- tournament mode: pre-defined fixtures, no manual team-by-team picking ----------
+// a team's overall strength, used only to bias random opponent selection by
+// difficulty — never used for anything else.
+function teamStrength(team) {
+  const r = teamRatings(team);
+  return (r.attack + r.defense) / 2;
+}
+
+function weightedSampleWithoutReplacement(items, weights, count) {
+  const pool = items.map((it, i) => ({ it, w: Math.max(0.0001, weights[i]) }));
+  const picked = [];
+  for (let k = 0; k < count && pool.length; k++) {
+    const total = pool.reduce((s, c) => s + c.w, 0);
+    let r = Math.random() * total;
+    let idx = 0;
+    for (; idx < pool.length; idx++) { r -= pool[idx].w; if (r <= 0) break; }
+    if (idx >= pool.length) idx = pool.length - 1;
+    picked.push(pool[idx].it);
+    pool.splice(idx, 1);
+  }
+  return picked;
+}
+
+// picks `count` saved teams (excluding names in excludeNames) at random, biased
+// by difficulty: 'hard' favors strong teams, 'easy' favors weak teams, 'medium'
+// is plain uniform random.
+function pickRandomTeamsByDifficulty(excludeNames, count, difficulty) {
+  const candidates = savedTeams.filter(tm => !excludeNames.includes(tm.name));
+  const strengths = candidates.map(tm => teamStrength(tm));
+  let weights;
+  if (difficulty === 'hard') weights = strengths.map(s => Math.pow(Math.max(0.1, s), 3));
+  else if (difficulty === 'easy') weights = strengths.map(s => Math.pow(Math.max(0.1, 11 - s), 3));
+  else weights = strengths.map(() => 1);
+  return weightedSampleWithoutReplacement(candidates, weights, count).map(tm => tm.name);
+}
+
 let tournament = null; // { format:'roundrobin'|'knockout', teamNames:[...], fixtures:[...], rounds:[[fixtureIdx,...],...] }
 
 function roundRobinFixtures(teamNames) {
@@ -6793,19 +6852,38 @@ function renderTournamentSetup() {
         <input type="checkbox" class="tournament-team-cb" value="${tm.name}" style="width:auto;"> <span>${tm.name}</span>
       </label>`).join('')}
     </div>
+    <div style="font-size:12px;color:#8fa89c;margin:10px 0 4px;">${t('tournamentRandomFillHint')}</div>
+    <div class="filters" style="margin-bottom:8px;">
+      <input id="tournament-random-count" type="number" min="1" max="${savedTeams.length}" value="3">
+      <select id="tournament-difficulty">
+        <option value="easy">${t('difficultyEasy')}</option>
+        <option value="medium" selected>${t('difficultyMedium')}</option>
+        <option value="hard">${t('difficultyHard')}</option>
+      </select>
+      <button id="btn-tournament-random-fill">${t('btnRandomFillTeams')}</button>
+    </div>
     <div class="squad-actions" style="margin-top:8px;">
       <button id="btn-tournament-create" class="primary" data-i18n="btnCreateTournament"></button>
     </div>
   `;
-  document.getElementById('tournament-format').textContent; // noop, keep i18n static apply simple
   document.getElementById('btn-tournament-create').textContent = t('btnCreateTournament');
+  document.getElementById('btn-tournament-random-fill').onclick = () => {
+    const checked = Array.from(document.querySelectorAll('.tournament-team-cb')).filter(cb => cb.checked).map(cb => cb.value);
+    const want = parseInt(document.getElementById('tournament-random-count').value, 10) || 0;
+    if (want <= 0) { showToast(t('tournamentRandomCountInvalid'))(); return; }
+    const difficulty = document.getElementById('tournament-difficulty').value;
+    const picks = pickRandomTeamsByDifficulty(checked, want, difficulty);
+    if (!picks.length) { showToast(t('tournamentNoMoreTeams'))(); return; }
+    document.querySelectorAll('.tournament-team-cb').forEach(cb => { if (picks.includes(cb.value)) cb.checked = true; });
+    showToast(t('tournamentRandomFilled', picks.length))();
+  };
   document.getElementById('btn-tournament-create').onclick = () => {
     const chosen = Array.from(document.querySelectorAll('.tournament-team-cb'))
       .filter(cb => cb.checked).map(cb => cb.value);
     if (chosen.length < 2) { showToast(t('tournamentNeedTwoPlus'))(); return; }
     const format = document.getElementById('tournament-format').value;
     const built = format === 'knockout' ? knockoutFixtures(chosen) : roundRobinFixtures(chosen);
-    tournament = { format, teamNames: chosen, fixtures: built.fixtures, rounds: built.rounds };
+    tournament = { format, teamNames: chosen, fixtures: built.fixtures, rounds: built.rounds, stats: {}, mvpAwarded: false };
     renderTournamentSetup();
     renderTournamentView();
     showToast(t('tournamentCreated'))();
@@ -6845,6 +6923,7 @@ function renderTournamentView() {
       html += '</div>';
     });
   }
+  if (!next && totalReal > 0) html += renderTournamentSummary();
   el.innerHTML = html;
   const playBtn = document.getElementById('btn-tournament-play');
   if (playBtn && next) {
@@ -6858,6 +6937,7 @@ function renderTournamentView() {
       if (tournament.format === 'knockout' && next.nextFixture != null) {
         tournament.fixtures[next.nextFixture][next.nextSlot] = winnerOf(next);
       }
+      accumulateTournamentStats(result);
       applyPostMatchDevelopment(teamA, teamB, result);
       renderMatchResult(result);
       renderTournamentView();
@@ -6871,6 +6951,89 @@ function renderTournamentView() {
       renderTournamentView();
     };
   }
+}
+
+// tallies per-player goals/assists/rating/position for the currently active
+// tournament, so a summary (top scorers, MVP, team of the tournament) can be
+// shown once every fixture has been played.
+function accumulateTournamentStats(result) {
+  const goalsBy = {}, assistsBy = {};
+  result.events.forEach(e => {
+    if (e.scorer) goalsBy[e.scorer.id] = (goalsBy[e.scorer.id] || 0) + 1;
+    if (e.assist) assistsBy[e.assist.id] = (assistsBy[e.assist.id] || 0) + 1;
+  });
+  function accumulate(rows) {
+    rows.forEach(row => {
+      const st = tournament.stats[row.p.id] || (tournament.stats[row.p.id] = { pid: row.p.id, goals: 0, assists: 0, ratingSum: 0, count: 0, posCounts: {} });
+      st.goals += goalsBy[row.p.id] || 0;
+      st.assists += assistsBy[row.p.id] || 0;
+      st.ratingSum += row.rating;
+      st.count++;
+      st.posCounts[row.pos] = (st.posCounts[row.pos] || 0) + 1;
+    });
+  }
+  accumulate(result.ratingsTable.a);
+  accumulate(result.ratingsTable.b);
+}
+
+// player-of-the-tournament bonus: a flat +0.25 potential bump, deliberately
+// far larger than any single match's development step, awarded exactly once
+// per tournament the first time the summary is rendered.
+const MVP_POTENTIAL_BONUS = 0.25;
+
+function awardMvpBonus(pid) {
+  const p = playerById(pid);
+  const before = CURRENT_POTENTIAL[p.id] != null ? CURRENT_POTENTIAL[p.id] : basePotential(p);
+  const after = Math.max(1, Math.min(10, Math.round((before + MVP_POTENTIAL_BONUS) * 100) / 100));
+  CURRENT_POTENTIAL[p.id] = after;
+  globalMatchIndex++;
+  if (!POTENTIAL_HISTORY[p.id]) POTENTIAL_HISTORY[p.id] = [{ match: 0, value: before }];
+  POTENTIAL_HISTORY[p.id].push({ match: globalMatchIndex, value: after });
+}
+
+function renderTournamentSummary() {
+  const entries = Object.values(tournament.stats);
+  if (!entries.length) return '';
+  entries.forEach(e => {
+    e.avgRating = e.count ? e.ratingSum / e.count : 0;
+    e.mainPos = Object.entries(e.posCounts).sort((a, b) => b[1] - a[1])[0][0];
+    e.score = e.avgRating + e.goals * 0.3 + e.assists * 0.2;
+  });
+  const mvp = entries.slice().sort((a, b) => b.score - a.score || b.goals - a.goals)[0];
+  if (mvp && !tournament.mvpAwarded) {
+    tournament.mvpAwarded = true;
+    tournament.mvpPid = mvp.pid;
+    awardMvpBonus(mvp.pid);
+  }
+  const mvpP = tournament.mvpPid ? playerById(tournament.mvpPid) : null;
+  const topScorers = entries.filter(e => e.goals > 0).sort((a, b) => b.goals - a.goals || b.assists - a.assists).slice(0, 5);
+  const topAssists = entries.filter(e => e.assists > 0).sort((a, b) => b.assists - a.assists || b.goals - a.goals).slice(0, 5);
+  const slotsNeeded = FORMATIONS['433'].map(s => s.pos);
+  const used = new Set();
+  const bestXI = slotsNeeded.map(pos => {
+    const candidates = entries.filter(e => e.mainPos === pos && !used.has(e.pid)).sort((a, b) => b.avgRating - a.avgRating);
+    if (!candidates.length) return null;
+    used.add(candidates[0].pid);
+    return { pos, p: playerById(candidates[0].pid), rating: candidates[0].avgRating };
+  }).filter(Boolean);
+  const link = (p) => `<span class="player-link" data-player-id="${p.id}" style="cursor:pointer;text-decoration:underline;">${displayName(p)}</span>`;
+  let html = `<div class="match-team-box" style="margin-top:14px;border:1px solid #e9c46a;">`;
+  html += `<div class="match-team-title" style="color:#e9c46a;">${t('tournamentSummaryTitle')}</div>`;
+  if (mvpP) html += `<div class="event-row"><b>${t('mvpLabel')}</b>: ${link(mvpP)} (${t('mvpBonusNote')})</div>`;
+  if (topScorers.length) {
+    html += `<div class="match-team-title" style="margin-top:8px;">${t('topScorersLabel')}</div><div class="match-team-list">`;
+    html += topScorers.map(e => `<div>${link(playerById(e.pid))} — ⚽ ${e.goals} · 🅰️ ${e.assists} · ${e.avgRating.toFixed(1)}</div>`).join('');
+    html += '</div>';
+  }
+  if (topAssists.length) {
+    html += `<div class="match-team-title" style="margin-top:8px;">${t('topAssistsLabel')}</div><div class="match-team-list">`;
+    html += topAssists.map(e => `<div>${link(playerById(e.pid))} — 🅰️ ${e.assists} · ⚽ ${e.goals} · ${e.avgRating.toFixed(1)}</div>`).join('');
+    html += '</div>';
+  }
+  html += `<div class="match-team-title" style="margin-top:8px;">${t('teamOfTournamentLabel')}</div><div class="match-team-list">`;
+  html += bestXI.map(slot => `<div>${POS_LABEL(slot.pos)}: ${link(slot.p)} — ${slot.rating.toFixed(2)}</div>`).join('');
+  html += '</div></div>';
+  return html;
 }
 
 // ---------- init ----------
