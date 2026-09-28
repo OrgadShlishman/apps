@@ -14,7 +14,7 @@
   }
   header {
     background:linear-gradient(135deg,#0a2e22,#0e1613); padding:22px 16px;
-    border-bottom:2px solid #1e4d38;
+    border-bottom:2px solid #1e4d38; position:relative;
   }
   .tag { font-size:11px; letter-spacing:1px; color:#7fd9ad; text-transform:uppercase; }
   header h1 { margin:6px 0 8px; font-size:26px; color:#e9c46a; }
@@ -161,63 +161,64 @@
 <body>
 
 <header>
+  <button id="lang-toggle" style="position:absolute;top:14px;left:14px;padding:6px 14px;border-radius:14px;border:1px solid #2d4038;background:#1a2a24;color:#e9c46a;font-size:13px;cursor:pointer;">EN</button>
   <div class="tag">LA MASIA / GRADUATES + ACADEMY</div>
-  <h1>לה מאסיה טרקר</h1>
-  <p>מעקב עצמאי אחר בוגרי האקדמיה של ברצלונה ושחקני האקדמיה הנוכחיים: 59 בוגרים (49 מוצגים כברירת מחדל, 10 שפרשו מוצגים באפשרות מיוחדת) + 79 שחקני אקדמיה בני 16+ + 16 שחקני הקבוצה הראשונה שהגיעו מחוץ ללה מאסיה (מוצגים באפשרות מיוחדת). סה״כ 154 שחקנים במאגר. כלי לבניית מערך חלומי מכלל השחקנים.</p>
+  <h1 data-i18n="appTitle">לה מאסיה טרקר</h1>
+  <p data-i18n="appSubtitle"></p>
   <div class="badges">
-    <span class="badge">תמונת מצב: 27.9.2026</span>
-    <span class="badge">סגל האקדמיה: עונת 2026/27</span>
-    <span class="badge">עצמאי · לא קשור ל־FC Barcelona</span>
+    <span class="badge" data-i18n="badgeSnapshot"></span>
+    <span class="badge" data-i18n="badgeSeason"></span>
+    <span class="badge" data-i18n="badgeIndependent"></span>
   </div>
 </header>
 
 <nav class="tabs">
-  <button id="tab-players" class="active">שחקנים</button>
-  <button id="tab-squad">בונה מערך</button>
-  <button id="tab-match">משחק</button>
+  <button id="tab-players" class="active" data-i18n="tabPlayers"></button>
+  <button id="tab-squad" data-i18n="tabSquad"></button>
+  <button id="tab-match" data-i18n="tabMatch"></button>
 </nav>
 
 <main>
 
 <section id="view-players">
   <div class="filters">
-    <input id="f-search" type="text" placeholder="חיפוש חופשי: שם שחקן או מועדון">
+    <input id="f-search" type="text" data-i18n-ph="searchPlaceholder">
     <select id="f-group">
-      <option value="">כל הקבוצות</option>
-      <option value="graduate">בוגרים</option>
-      <option value="atletic">בארסה אתלטיק</option>
-      <option value="juvenilA">נוער א׳</option>
-      <option value="juvenilB">נוער ב׳</option>
-      <option value="firstTeam">קבוצה ראשונה (חתימות)</option>
+      <option value="" data-i18n="optAllGroups"></option>
+      <option value="graduate" data-i18n="groupGraduate"></option>
+      <option value="atletic" data-i18n="groupAtletic"></option>
+      <option value="juvenilA" data-i18n="groupJuvenilA"></option>
+      <option value="juvenilB" data-i18n="groupJuvenilB"></option>
+      <option value="firstTeam" data-i18n="groupFirstTeam"></option>
     </select>
     <select id="f-position">
-      <option value="">כל העמדות</option>
-      <option value="GK">שוער</option>
-      <option value="CB">בלם</option>
-      <option value="LB">מגן שמאל</option>
-      <option value="RB">מגן ימין</option>
-      <option value="DM">קשר אחורי</option>
-      <option value="CM">קשר מרכזי</option>
-      <option value="AM">קשר התקפי</option>
-      <option value="LW">כנף שמאל</option>
-      <option value="RW">כנף ימין</option>
-      <option value="ST">חלוץ</option>
+      <option value="" data-i18n="optAllPositions"></option>
+      <option value="GK" data-i18n="posGK"></option>
+      <option value="CB" data-i18n="posCB"></option>
+      <option value="LB" data-i18n="posLB"></option>
+      <option value="RB" data-i18n="posRB"></option>
+      <option value="DM" data-i18n="posDM"></option>
+      <option value="CM" data-i18n="posCM"></option>
+      <option value="AM" data-i18n="posAM"></option>
+      <option value="LW" data-i18n="posLW"></option>
+      <option value="RW" data-i18n="posRW"></option>
+      <option value="ST" data-i18n="posST"></option>
     </select>
     <select id="f-status">
-      <option value="">כל המצבים</option>
-      <option value="active">פעיל</option>
-      <option value="academy">באקדמיה</option>
-      <option value="free_agent">ללא מועדון</option>
-      <option value="retired">פרש</option>
+      <option value="" data-i18n="optAllStatuses"></option>
+      <option value="active" data-i18n="statusActive"></option>
+      <option value="academy" data-i18n="statusAcademy"></option>
+      <option value="free_agent" data-i18n="statusFreeAgent"></option>
+      <option value="retired" data-i18n="statusRetired"></option>
     </select>
     <select id="f-league">
-      <option value="">כל הליגות</option>
+      <option value="" data-i18n="optAllLeagues"></option>
     </select>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
-      <input type="checkbox" id="f-include-retired" style="width:auto;"> הצג גם שחקנים שפרשו
+      <input type="checkbox" id="f-include-retired" style="width:auto;"> <span data-i18n="labelIncludeRetired"></span>
     </label>
     <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#8fa89c;white-space:nowrap;">
-      <input type="checkbox" id="f-include-firstteam" style="width:auto;"> הצג גם שחקני קבוצה ראשונה שלא מלה מאסיה
+      <input type="checkbox" id="f-include-firstteam" style="width:auto;"> <span data-i18n="labelIncludeFirstTeam"></span>
     </label>
   </div>
   <div class="result-count" id="result-count"></div>
@@ -232,22 +233,22 @@
   </div>
   <div id="pitch"></div>
   <div class="squad-actions">
-    <button id="btn-clear-squad">אפס מערך</button>
-    <button id="btn-random-unused">מלא אקראית — שחקנים שלא נבחרו עדיין</button>
-    <button id="btn-random-all">מלא אקראית — מכלל השחקנים</button>
-    <button id="btn-copy-squad" class="primary">העתק מערך לשיתוף</button>
+    <button id="btn-clear-squad" data-i18n="btnClearSquad"></button>
+    <button id="btn-random-unused" data-i18n="btnRandomUnused"></button>
+    <button id="btn-random-all" data-i18n="btnRandomAll"></button>
+    <button id="btn-copy-squad" class="primary" data-i18n="btnCopySquad"></button>
   </div>
   <div class="squad-actions" style="margin-top:6px;">
-    <input id="team-name-input" type="text" placeholder="שם הקבוצה (למשל: הרכב א׳)" style="flex:1;">
-    <button id="btn-save-team" class="primary">שמור קבוצה</button>
+    <input id="team-name-input" type="text" data-i18n-ph="teamNamePlaceholder" style="flex:1;">
+    <button id="btn-save-team" class="primary" data-i18n="btnSaveTeam"></button>
   </div>
   <div id="saved-teams-list" style="margin-top:8px;font-size:13px;color:#8fa89c;"></div>
   <div id="picker-panel" class="hidden">
     <div class="picker-header" id="picker-header"></div>
     <div class="filters" style="margin-bottom:8px;">
-      <input id="picker-search" type="text" placeholder="חיפוש שם">
+      <input id="picker-search" type="text" data-i18n-ph="pickerSearchPlaceholder">
       <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#8fa89c;">
-        <input type="checkbox" id="picker-show-all" style="width:auto;"> הצג את כל השחקנים (לא רק לעמדה זו)
+        <input type="checkbox" id="picker-show-all" style="width:auto;"> <span data-i18n="pickerShowAll"></span>
       </label>
     </div>
     <div id="picker-list"></div>
@@ -271,12 +272,12 @@
     </div>
   </div>
   <div class="squad-actions">
-    <button id="btn-sim-match" class="primary">סמלץ תוצאה (חד־פעמי, לא משפיע על פוטנציאלים)</button>
+    <button id="btn-sim-match" class="primary" data-i18n="btnSimMatch"></button>
   </div>
   <div class="squad-actions" style="margin-top:6px;">
-    <button id="btn-season-start">התחל סדרת משחקים חדשה</button>
-    <button id="btn-season-play" class="primary">שחק משחק נוסף בסדרה</button>
-    <button id="btn-season-reset">אפס סדרה (חזרה לפוטנציאלים המקוריים)</button>
+    <button id="btn-season-start" data-i18n="btnSeasonStart"></button>
+    <button id="btn-season-play" class="primary" data-i18n="btnSeasonPlay"></button>
+    <button id="btn-season-reset" data-i18n="btnSeasonReset"></button>
   </div>
   <div id="season-status"></div>
   <div id="match-result"></div>
@@ -290,7 +291,7 @@
 
 <div id="toast"></div>
 
-<footer>לה מאסיה טרקר — מסמך תיעוד עצמאי · לא קשור ל־FC Barcelona · נוצר 27.9.2026</footer>
+<footer data-i18n="footerText"></footer>
 
 <script>
 const PLAYERS = [
@@ -328,7 +329,8 @@ const PLAYERS = [
       "https://www.intermiamicf.com/news/inter-miami-cf-signs-leo-messi-to-contract-extension",
       "https://www.intermiamicf.com/news/lionel-messi-wins-2025-mls-golden-boot-presented-by-audi"
     ],
-    "potential": 10
+    "potential": 10,
+    "nameEn": null
   },
   {
     "id": "pedro",
@@ -363,7 +365,8 @@ const PLAYERS = [
       "https://www.sslazio.it/en/news/comunicati/rinnovo-contrattuale-per-pedro",
       "https://tribuna.com/en/news/2026-05-22-pedro-rodriguez-bids-farewell-to-lazio-forever-one-of-you/"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "roberto",
@@ -396,7 +399,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.lagalaxy.com/news/la-galaxy-sign-former-fc-barcelona-and-spanish-international-midfielder-sergi-roberto"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "bartra",
@@ -428,7 +432,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/marc-bartra/transfers/spieler/99922/"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "tello",
@@ -462,7 +467,8 @@ const PLAYERS = [
       "https://www.estadiodeportivo.com/futbol/fichajes/cristian-tello-llegara-como-agente-libre-20250905-510656.html",
       "https://www.transfermarkt.us/cristian-tello/transfers/spieler/141834"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "deulofeu",
@@ -496,7 +502,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/759089/agreement-with-watford-fc-for-transfer-of-gerard-deulofeu",
       "https://www.theguardian.com/football/2025/oct/16/gerard-deulofeu-battle-to-play-football-again-interview"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "munir",
@@ -531,7 +538,8 @@ const PLAYERS = [
       "https://www.latribunadealbacete.es/noticia/z88f2fe37-9e45-4f26-83a7e7989263aa5f/202608/munir-es-un-reto-que-afronto-con-con-ilusion-y-trabajo",
       "https://players.fcbarcelona.com/en/player/589-munir-munir-haddadi-mohamed"
     ],
-    "potential": 1
+    "potential": 1,
+    "nameEn": null
   },
   {
     "id": "sandro",
@@ -563,7 +571,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/sandro-ramirez/transfers/spieler/199369"
     ],
-    "potential": 2
+    "potential": 2,
+    "nameEn": null
   },
   {
     "id": "grimaldo",
@@ -596,7 +605,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/1074173/alejandro-grimaldo-to-sign-for-benfica",
       "https://en.atleticodemadrid.com/jugadores/alejandro-grimaldo-garcia-2026-2027-2"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "samper",
@@ -630,7 +640,8 @@ const PLAYERS = [
       "https://dvsc.hu/volt-barcelona-jatekost-igazolt-a-dvsc/",
       "https://www.transfermarkt.us/sergi-samper/transfers/spieler/181112"
     ],
-    "potential": 2
+    "potential": 2,
+    "nameEn": null
   },
   {
     "id": "onana",
@@ -662,7 +673,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.manutd.com/en/news/andre-onana-rejoins-trabzonspor-on-loan-2026"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "simons",
@@ -697,7 +709,8 @@ const PLAYERS = [
       "https://www.tottenhamhotspur.com/player/493362/xavi-simons",
       "https://www.bbc.co.uk/sport/football/articles/cy0101p91z3o"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "olmo",
@@ -730,7 +743,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/players/16677/dani-olmo"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "cucu",
@@ -763,7 +777,8 @@ const PLAYERS = [
       "https://www.realmadrid.com/en-US/news/club/announcements/comunicado-oficial-cucurella-15-06-2026",
       "https://www.bbc.com/sport/football/articles/cx2xp7gv09lo"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "moriba",
@@ -796,7 +811,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/2239557/agreement-with-rb-leipzig-for-the-transfer-of-ilaix-moriba"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "ansu",
@@ -831,7 +847,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/4528731/ansu-fati-joins-as-monaco",
       "https://www.asmonaco.com/en/news/ansu-fati-avec-l-as-monaco-jusqu-en-2030"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "riqui",
@@ -866,7 +883,8 @@ const PLAYERS = [
       "https://www.lagalaxy.com/news/riqui-puig-undergoes-successful-knee-surgery",
       "https://www.espn.com/soccer/story/_/id/47493503/la-galaxy-riqui-puig-injury-knee-acl-2027-mls"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "alena",
@@ -899,7 +917,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/carles-alena/transfers/spieler/284854"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "mingueza",
@@ -933,7 +952,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/2709314/agreement-with-celta-for-mingueza-transfer",
       "https://www.cpfc.co.uk/news/first-team/oscar-minguezas-joins-crystal-palace/"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "nico",
@@ -967,7 +987,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/3610157/agreement-for-the-transfer-of-nico-to-porto",
       "https://www.newcastleunited.com/en/news/newcastle-united-complete-nico-gonzalez-signing"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "valle",
@@ -999,7 +1020,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/4277463/como-1907-exercise-buy-out-clause-for-alex-valle"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "pena",
@@ -1031,7 +1053,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/4525482/agreement-for-the-transfer-of-inaki-pena"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "fort",
@@ -1064,7 +1087,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/4568488/hector-fort-transferred-to-real-sociedad"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "guiu",
@@ -1097,7 +1121,8 @@ const PLAYERS = [
       "https://rbleipzig.com/en/news/marc-guiu-transfer-rb-leipzig-chelsea-2026",
       "https://www.bbc.com/sport/football/articles/cd79d97n3yqo"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "marmol",
@@ -1130,7 +1155,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.feyenoord.com/nl/news/mika-marmol-volgende-zomerse-versterking-feyenoord-300626"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "riad",
@@ -1162,7 +1188,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/chadi-riad/transfers/spieler/689637"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "miranda",
@@ -1194,7 +1221,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.us/juan-miranda/transfers/spieler/341227"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "collado",
@@ -1227,7 +1255,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.us/alex-collado/transfers/spieler/282722"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "casado",
@@ -1260,7 +1289,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/4570290/marc-casado-loaned-to-deportivo-a-coruna"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "fermin",
@@ -1293,7 +1323,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/news/4441329/fermn-contract-extension-agreed"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "balde",
@@ -1325,7 +1356,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/players/68906/alejandro-balde"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "gavi",
@@ -1358,7 +1390,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/players/116719/gavi"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "bernal",
@@ -1390,7 +1423,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/marc-bernal/transfers/spieler/1018920"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "cubarsi",
@@ -1422,7 +1456,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/players/129400/pau-cubarsi"
     ],
-    "potential": 9
+    "potential": 9,
+    "nameEn": null
   },
   {
     "id": "lamine",
@@ -1455,7 +1490,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/4274403/lamine-yamal-extends-contract-with-fc-barcelona-to-2031"
     ],
-    "potential": 9
+    "potential": 9,
+    "nameEn": null
   },
   {
     "id": "toni",
@@ -1488,7 +1524,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/4570303/agreement-with-venezia-fc-for-the-transfer-of-toni-fernandez"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "dro",
@@ -1521,7 +1558,8 @@ const PLAYERS = [
       "https://www.psg.fr/en/content/pr-dro-fernandez-joins-paris-saint-germain-on-a-deal-until-2030",
       "https://www.theguardian.com/football/2026/jan/26/barcelona-dro-fernandez-psg-transfer"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "abel",
@@ -1554,7 +1592,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/1593352/abel-ruiz-leaves-for-sc-braga",
       "https://www.gironafc.cat/en/news/abel-ruiz-red-and-white-until-2029"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "konrad",
@@ -1589,7 +1628,8 @@ const PLAYERS = [
       "https://www.lausanne-sport.ch/merci-konrad-de-la-fuente/",
       "https://www.realsporting.com/noticias/comunicado-oficial-konrad-de-la-fuente"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "carlesperez",
@@ -1623,7 +1663,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/1593415/agreement-with-as-roma-for-the-loan-of-carles-perez",
       "https://www.gironafc.cat/en/news/el-girona-fc-aposta-pel-talent-ofensiu-de-carles-perez"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "arnau",
@@ -1656,7 +1697,8 @@ const PLAYERS = [
       "https://www.rcdmallorca.es/en/news/arnau-tenas-nuevo-portero-del-rcd-mallorca",
       "https://panel.villarrealcf.es/en/arnau-tenas-jugara-cedido-en-el-rcd-mallorca/"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "guille-fernandez",
@@ -1690,7 +1732,8 @@ const PLAYERS = [
       "https://www.rcdmallorca.es/noticias/guillermo-fernandez-nuevo-jugador-del-rcd-mallorca",
       "https://www.sport.es/es/noticias/barca/oficial-guille-fernandez-mallorca-barca-barcelona-133829918"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "xavi-espart",
@@ -1725,7 +1768,8 @@ const PLAYERS = [
       "https://www.infobae.com/espana/agencias/2026/08/27/el-barca-inscribe-a-xavi-espart-como-jugador-del-primer-equipo/",
       "https://es.wikipedia.org/wiki/Xavi_Espart"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "brian-farinas",
@@ -1761,7 +1805,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/nuevo-4-barca-brian-farinas-133879455",
       "https://www.transfermarkt.es/brian-farinas/profil/spieler/938154"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "jofre-torrents",
@@ -1795,7 +1840,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/oficial-jofre-torrents-marcha-traspasado-133121956",
       "https://es.wikipedia.org/wiki/Jofre_Torrents"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "aron-yaakobishvili",
@@ -1828,7 +1874,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/oficial-yaakobishvili-ficha-almeria-aron-barca-barcelona-portero-133322868",
       "https://www.diariodealmeria.es/ud-almeria/almeria-cierra-porteria-aron-yaakobishvili_0_2007744132.html"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Áron Yaakobishvili"
   },
   {
     "id": "ebrima-tunkara",
@@ -1865,7 +1912,8 @@ const PLAYERS = [
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260924/1004230699/ebrima-tunkara-recta-final.html",
       "https://t.me/la_masiafcb/22704"
     ],
-    "potential": 9
+    "potential": 9,
+    "nameEn": "Ebrima Tunkara"
   },
   {
     "id": "adam-argemi",
@@ -1900,7 +1948,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260926/1004231556/barca-atletic-pena-sport-2a-rfef.html"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "eder-aller",
@@ -1935,7 +1984,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/debut-salvaje-ignasi-quer-cuatro-134005269",
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "oscar-gistau",
@@ -1969,7 +2019,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4579045/ud-barbastro-0-1-barca-atletic-first-win-away-of-the-season",
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "orian-goren",
@@ -2004,7 +2055,8 @@ const PLAYERS = [
       "https://www.ynet.co.il/sport/israelisoccer/article/hjza0tshmx",
       "https://www.c14.co.il/article/1703799"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": "Orian Goren"
   },
   {
     "id": "ibrahim-diarra",
@@ -2040,7 +2092,8 @@ const PLAYERS = [
       "https://socblaugrana.com/por-clasificar/el-barca-atletic-duerme-lider-tras-golear-al-pena-sport-4-0/",
       "https://t.me/la_masiafcb/22804"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "ignasi-quer",
@@ -2074,7 +2127,8 @@ const PLAYERS = [
       "https://socblaugrana.com/por-clasificar/el-barca-atletic-duerme-lider-tras-golear-al-pena-sport-4-0/",
       "https://t.me/la_masiafcb/22811"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": "Ignasi Quer"
   },
   {
     "id": "iker-rodriguez",
@@ -2107,7 +2161,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22723",
       "https://t.me/la_masiafcb/22752"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "alex-gonzalez",
@@ -2143,7 +2198,8 @@ const PLAYERS = [
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260926/1004231556/barca-atletic-pena-sport-2a-rfef.html",
       "https://t.me/la_masiafcb/22548"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "alex-campos",
@@ -2177,7 +2233,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4579045/ud-barbastro-0-1-barca-atletic-first-win-away-of-the-season",
       "https://t.me/la_masiafcb/22763"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "alexander-walton",
@@ -2212,7 +2269,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/barca-atletic-dorsales-nueva-temporada-134001813",
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260926/1004231556/barca-atletic-pena-sport-2a-rfef.html"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "guillem-victor",
@@ -2246,7 +2304,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/barca-atletic-dorsales-nueva-temporada-134001813",
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260926/1004231556/barca-atletic-pena-sport-2a-rfef.html"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "joni-hernandez",
@@ -2282,7 +2341,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4579045/ud-barbastro-0-1-barca-atletic-first-win-away-of-the-season",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "jesse-bisiwu",
@@ -2317,7 +2377,8 @@ const PLAYERS = [
       "https://www.transfermarkt.us/jesse-bisiwu/profil/spieler/1105549",
       "https://t.me/la_masiafcb/22671"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "dani-avila",
@@ -2351,7 +2412,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4539066/barca-atletic-202627-back-on-duty",
       "https://www.transfermarkt.us/dani-avila/profil/spieler/962112"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "josue-caicedo",
@@ -2386,7 +2448,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4572927/barca-atletic-5-0-cd-naxara-strong-start",
       "https://t.me/la_masiafcb/22531"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "jordi-pesquer",
@@ -2421,7 +2484,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4572927/barca-atletic-5-0-cd-naxara-strong-start",
       "https://t.me/la_masiafcb/22633"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "javi-castro",
@@ -2455,7 +2519,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/barca-atletic-dorsales-nueva-temporada-134001813",
       "https://www.transfermarkt.us/fc-barcelona-b/startseite/verein/2464"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "hafiz-gariba",
@@ -2491,7 +2556,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/debut-salvaje-ignasi-quer-cuatro-134005269",
       "https://t.me/la_masiafcb/22741"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Hafiz Gariba"
   },
   {
     "id": "juan-ybarra",
@@ -2526,7 +2592,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/barca-atletic-dorsales-nueva-temporada-134001813",
       "https://www.fcbarcelona.com/en/football/barca-b/news/4579045/ud-barbastro-0-1-barca-atletic-first-win-away-of-the-season"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "juan-hernandez",
@@ -2560,7 +2627,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.es/es/futbol/barca-b/noticias/4446196/juan-hernandez-sera-blaugrana-hasta-el-2028",
       "https://www.sport.es/es/noticias/barca/buenas-noticias-juan-hernandez-adelanta-133622521"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "hamza-abdelkarim",
@@ -2594,7 +2662,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/first-team/news/4576802/hamza-abdelkarim-i-want-to-write-history-with-barca",
       "https://www.fcbarcelona.es/es/futbol/formativo-masculino/noticias/4507306/hamza-abdelkarim-al-mundial-con-egipto"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "juwensley-onstein",
@@ -2626,7 +2695,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4539066/barca-atletic-202627-back-on-duty"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "landry-farre",
@@ -2662,7 +2732,8 @@ const PLAYERS = [
       "https://socblaugrana.com/por-clasificar/el-barca-atletic-duerme-lider-tras-golear-al-pena-sport-4-0/",
       "https://t.me/la_masiafcb/22799"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "mirza-catovic",
@@ -2697,7 +2768,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/debut-salvaje-ignasi-quer-cuatro-134005269",
       "https://t.me/la_masiafcb/22687"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "max-bonfill",
@@ -2732,7 +2804,8 @@ const PLAYERS = [
       "https://www.transfermarkt.com/max-bonfill/profil/spieler/990314",
       "https://www.fcbarcelona.com/en/football/barca-b/news/4539066/barca-atletic-202627-back-on-duty"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "aziz-issah",
@@ -2767,7 +2840,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-b/news/4572927/barca-atletic-5-0-cd-naxara-strong-start",
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260926/1004231556/barca-atletic-pena-sport-2a-rfef.html"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "pedro-villar",
@@ -2804,7 +2878,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/debut-salvaje-ignasi-quer-cuatro-134005269",
       "https://t.me/la_masiafcb/22723"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Pedro Villar"
   },
   {
     "id": "pedro-rodriguez",
@@ -2838,7 +2913,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22763",
       "https://www.fcbarcelona.com/en/football/barca-b/news/4579045/ud-barbastro-0-1-barca-atletic-first-win-away-of-the-season"
     ],
-    "potential": 8
+    "potential": 8,
+    "nameEn": null
   },
   {
     "id": "shane-kluivert",
@@ -2874,7 +2950,8 @@ const PLAYERS = [
       "https://socblaugrana.com/por-clasificar/el-barca-atletic-duerme-lider-tras-golear-al-pena-sport-4-0/",
       "https://t.me/la_masiafcb/22805"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": "Shane Kluivert"
   },
   {
     "id": "sama-nomoko",
@@ -2909,7 +2986,8 @@ const PLAYERS = [
       "https://www.transfermarkt.com/fc-barcelona-atletic/kader/verein/2464/saison_id/2026",
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20260926/1004231421/barca-trabaja-renovacion-sama-nomoko.html"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": "Sama Nomoko"
   },
   {
     "id": "patricio-pacifico",
@@ -2942,7 +3020,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.es/es/futbol/barca-b/noticias/4532877/acuerdo-para-ampliar-la-cesion-de-patricio-pacifico"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "ajay-tavares",
@@ -2977,7 +3056,8 @@ const PLAYERS = [
       "https://www.canaries.co.uk/content/tavares-completes-move-to-fc-barcelona",
       "https://global.espn.com/football/story/_/id/48014441/barcelona-set-sign-teenage-norwich-city-winger-ajay-tavares"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": "Ajay Tavares"
   },
   {
     "id": "adrian-guerrero",
@@ -3011,7 +3091,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "iu-martinez",
@@ -3048,7 +3129,8 @@ const PLAYERS = [
       "https://www.flashscore.com/player/juncadella-iu/21xYcLSk/",
       "https://www.mundodeportivo.com/futbol/futbol-catala/20260920/1004229482/completa-jornada-maxima-categoria-juvenil-nueva-goleada-barca.html"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "baba-kourouma",
@@ -3085,7 +3167,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22759",
       "https://t.me/la_masiafcb/22690"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Baba Kourouma"
   },
   {
     "id": "joan-ingles",
@@ -3119,7 +3202,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "gerard-sala",
@@ -3153,7 +3237,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "lorenzo-oertli",
@@ -3185,7 +3270,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22682"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "michal-zuk",
@@ -3219,7 +3305,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22662",
       "https://t.me/la_masiafcb/22762"
     ],
-    "potential": 5
+    "potential": 5,
+    "nameEn": null
   },
   {
     "id": "nuhu-fofana",
@@ -3255,7 +3342,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22685",
       "https://t.me/la_masiafcb/22733"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "nil-vicens",
@@ -3290,7 +3378,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": 3
+    "potential": 3,
+    "nameEn": null
   },
   {
     "id": "nil-teixidor",
@@ -3324,7 +3413,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://t.me/la_masiafcb/22723"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "nico-marcipar",
@@ -3359,7 +3449,8 @@ const PLAYERS = [
       "https://www.transfermarkt.com/nico-marcipar/profil/spieler/1154934",
       "https://t.me/la_masiafcb/22714"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": "Nico Marcipar"
   },
   {
     "id": "samuel-borniquel",
@@ -3394,7 +3485,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "pau-berges",
@@ -3427,7 +3519,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22682",
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "pablo-pena",
@@ -3460,7 +3553,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22682",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "pol-bernabeu",
@@ -3494,7 +3588,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22682",
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "xavi-mirangels",
@@ -3526,7 +3621,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22682"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "raul-exposito",
@@ -3559,7 +3655,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22682",
       "https://t.me/la_masiafcb/22584"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "roberto-tomas",
@@ -3594,7 +3691,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22682",
       "https://www.fcbarcelona.com/en/football/barca-academy/news/4574554/u19-fc-barcelona-1-2-feyenoord-debut-defeat"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "gorka-buil",
@@ -3628,7 +3726,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/football/fc-barcelona-u19b/players",
       "https://www.transfermarkt.com/fc-barcelona-juvenil-a/kader/verein/2470/saison_id/2026"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "genis-clua",
@@ -3662,7 +3761,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22285",
       "https://www.transfermarkt.com/fc-barcelona-juvenil-a/kader/verein/2470/saison_id/2026"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "gerard-valls",
@@ -3696,7 +3796,8 @@ const PLAYERS = [
       "https://www.fotmob.com/en-GB/players/1830285/gerard-valls",
       "https://www.transfermarkt.com/fc-barcelona-juvenil-a/kader/verein/2470/saison_id/2026"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "sergi-mayans",
@@ -3728,7 +3829,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.sport.es/es/noticias/barca/futbol-base/sergi-mayans-central-zurdo-impresionado-133464966"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "madou-murcia",
@@ -3758,7 +3860,8 @@ const PLAYERS = [
     "notes": "גיל 18 לפי מקור הסגל בספטמבר 2026. סגל Transfermarkt; רישום משחק אינו מובטח.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-a/kader/verein/2470/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "ibrahim-babayev",
@@ -3788,7 +3891,8 @@ const PLAYERS = [
     "notes": "גיל 18 לפי מקור הסגל בספטמבר 2026. סגל Transfermarkt; רישום משחק אינו מובטח.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-a/kader/verein/2470/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "byron-mendoza",
@@ -3818,7 +3922,8 @@ const PLAYERS = [
     "notes": "גיל 17 לפי מקור הסגל בספטמבר 2026. סגל Transfermarkt; רישום משחק אינו מובטח.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-a/kader/verein/2470/saison_id/2026",
     "extraSources": [],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "mikael-baza",
@@ -3851,7 +3956,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22617",
       "https://www.vavel.com/es/futbol/2026/08/31/fc-barcelona/1269719-el-barca-cierra-el-fichaje-de-mikael-baza.html"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "erik-dominguez",
@@ -3886,7 +3992,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22659",
       "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "luca-perez",
@@ -3920,7 +4027,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22402",
       "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "pau-espi",
@@ -3950,7 +4058,8 @@ const PLAYERS = [
     "notes": "גיל 17 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "elyott-daussy",
@@ -3980,7 +4089,8 @@ const PLAYERS = [
     "notes": "גיל 16 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "roc-martinez",
@@ -4012,7 +4122,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22437"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "pere-villacorta",
@@ -4042,7 +4153,8 @@ const PLAYERS = [
     "notes": "גיל 16 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "ahmed-abarkane",
@@ -4072,7 +4184,8 @@ const PLAYERS = [
     "notes": "גיל 16 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "alvaro-gomez",
@@ -4102,7 +4215,8 @@ const PLAYERS = [
     "notes": "גיל 17 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "guiu-xucla",
@@ -4134,7 +4248,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22285"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "oscar-medina",
@@ -4166,7 +4281,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22438"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "mahdi-el-maimouni",
@@ -4198,7 +4314,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.marca.com/futbol/barcelona/2026/07/24/barcelona-ficha-libre-medio-mahdi-maimouni-version-zurda-sergio-busquets.html"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "ignasi-bassas",
@@ -4228,7 +4345,8 @@ const PLAYERS = [
     "notes": "גיל 16 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "artem-rybak",
@@ -4260,7 +4378,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22285"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "hugo-garces",
@@ -4294,7 +4413,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22437",
       "https://t.me/la_masiafcb/22396"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "unai-balmon",
@@ -4324,7 +4444,8 @@ const PLAYERS = [
     "notes": "גיל 16 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "ruslan-mba",
@@ -4357,7 +4478,8 @@ const PLAYERS = [
       "https://t.me/la_masiafcb/22024",
       "https://t.me/la_masiafcb/22437"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "noah-garcia",
@@ -4387,7 +4509,8 @@ const PLAYERS = [
     "notes": "גיל 16 לפי מקור הסגל בספטמבר 2026. TM מציג גיל אך לא תמיד תאריך לידה; אין להסתמך על פרטי החוזה של מאגר חיצוני.",
     "mainSource": "https://www.transfermarkt.com/fc-barcelona-juvenil-b/kader/verein/39813/saison_id/2026",
     "extraSources": [],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "ismael-ziani",
@@ -4419,7 +4542,8 @@ const PLAYERS = [
     "extraSources": [
       "https://t.me/la_masiafcb/22696"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "dany-freire",
@@ -4453,7 +4577,8 @@ const PLAYERS = [
       "https://www.flashscore.es/noticias/futbol-fc-barcelona-dany-freire-fichaje-barca-juvenil/K2CFRzo2/",
       "https://t.me/la_masiafcb/22437"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "arnau-casas",
@@ -4487,7 +4612,8 @@ const PLAYERS = [
       "https://www.sport.es/es/noticias/barca/futbol-base/barca-apuesta-talento-catalan-incorporacion-133125250",
       "https://t.me/la_masiafcb/22229"
     ],
-    "potential": null
+    "potential": null,
+    "nameEn": null
   },
   {
     "id": "quim-junyent",
@@ -4520,7 +4646,8 @@ const PLAYERS = [
       "https://barcauniversal.com/confirmed-barcelona-starlet-completes-free-transfer-switch-to-spanish-club/",
       "https://www.mundodeportivo.com/futbol/fc-barcelona/20251127/1002576919/campeones-youth-league-buscan-hacerse-hueco-fuera-barca.html"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "jan-virgili",
@@ -4553,7 +4680,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/4351743/agreement-for-the-transfer-of-jan-virgili-to-mallorca",
       "https://en.wikipedia.org/wiki/Jan_Virgili"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": "Jan Virgili"
   },
   {
     "id": "arnau-pradas",
@@ -4586,7 +4714,8 @@ const PLAYERS = [
       "https://www.transfermarkt.com/arnau-pradas/profil/spieler/938159",
       "https://www.barcablaugranes.com/2025/7/3/24460568/pau-prim-joins-al-sadd-arnau-pradas-heads-to-al-wahda-after-leaving-barcelona"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": "Arnau Pradas"
   },
   {
     "id": "thiago",
@@ -4620,7 +4749,8 @@ const PLAYERS = [
       "https://www.fcbarcelona.com/en/news/1138515/thiago-alcantara-sold-to-bayern-munich-for-25-million-euros",
       "https://www.fcbarcelona.com/en/football/first-team/news/4054016/thiago-alcantara-announces-retirement/featured"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "cesc",
@@ -4653,7 +4783,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/news/1123437/agreement-with-chelsea-for-the-transfer-of-cesc-fabregas"
     ],
-    "potential": 9
+    "potential": 9,
+    "nameEn": null
   },
   {
     "id": "busquets",
@@ -4686,7 +4817,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/news/4369754/sergio-busquets-to-retire-at-the-end-of-the-season/featured"
     ],
-    "potential": 9
+    "potential": 9,
+    "nameEn": null
   },
   {
     "id": "alba",
@@ -4718,7 +4850,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.fcbarcelona.com/en/football/first-team/news/4415821/dream-ending-for-jordi-alba-and-sergio-busquets/featured"
     ],
-    "potential": 7
+    "potential": 7,
+    "nameEn": null
   },
   {
     "id": "pique",
@@ -4750,7 +4883,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/gerard-pique/transfers/spieler/18944"
     ],
-    "potential": 8
+    "potential": 8,
+    "nameEn": null
   },
   {
     "id": "montoya",
@@ -4782,7 +4916,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/martin-montoya/transfers/spieler/68645"
     ],
-    "potential": 6
+    "potential": 6,
+    "nameEn": null
   },
   {
     "id": "rafinha",
@@ -4815,7 +4950,8 @@ const PLAYERS = [
     "extraSources": [
       "https://www.transfermarkt.com/rafinha/transfers/spieler/129473"
     ],
-    "potential": 4
+    "potential": 4,
+    "nameEn": null
   },
   {
     "id": "puyol",
@@ -4847,7 +4983,8 @@ const PLAYERS = [
     "extraSources": [
       "https://en.wikipedia.org/wiki/Carles_Puyol"
     ],
-    "potential": 8
+    "potential": 8,
+    "nameEn": "Carles Puyol"
   },
   {
     "id": "valdes",
@@ -4880,7 +5017,8 @@ const PLAYERS = [
       "https://en.wikipedia.org/wiki/V%C3%ADctor_Vald%C3%A9s",
       "https://www.espn.com/soccer/barcelona/story/3335577/former-barcelona-and-manchester-united-keeper-victor-valdes-retires"
     ],
-    "potential": 8
+    "potential": 8,
+    "nameEn": "Víctor Valdés"
   },
   {
     "id": "iniesta",
@@ -4913,7 +5051,8 @@ const PLAYERS = [
       "https://www.theguardian.com/football/2024/oct/08/tearful-andres-iniesta-announces-retirement-barcelona-spain",
       "https://www.dailysabah.com/sports/football/iniesta-begins-coaching-career-with-gulf-united-in-uae-2nd-tier"
     ],
-    "potential": 9
+    "potential": 9,
+    "nameEn": "Andrés Iniesta"
   },
   {
     "id": "joan-garcia",
@@ -4945,7 +5084,8 @@ const PLAYERS = [
     "age": 25,
     "seasonNote": "",
     "notes": "",
-    "potential": 8
+    "potential": 8,
+    "nameEn": "Joan García"
   },
   {
     "id": "szczesny",
@@ -4977,7 +5117,8 @@ const PLAYERS = [
     "age": 36,
     "seasonNote": "",
     "notes": "",
-    "potential": 3
+    "potential": 3,
+    "nameEn": "Wojciech Szczęsny"
   },
   {
     "id": "livakovic",
@@ -5009,7 +5150,8 @@ const PLAYERS = [
     "age": 31,
     "seasonNote": "",
     "notes": "",
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Dominik Livaković"
   },
   {
     "id": "kounde",
@@ -5042,7 +5184,8 @@ const PLAYERS = [
     "age": 27,
     "seasonNote": "",
     "notes": "",
-    "potential": 4
+    "potential": 4,
+    "nameEn": "Jules Koundé"
   },
   {
     "id": "christensen",
@@ -5074,7 +5217,8 @@ const PLAYERS = [
     "age": 30,
     "seasonNote": "",
     "notes": "",
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Andreas Christensen"
   },
   {
     "id": "gerard-martin",
@@ -5107,7 +5251,8 @@ const PLAYERS = [
     "age": 24,
     "seasonNote": "",
     "notes": "",
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Gerard Martín"
   },
   {
     "id": "eric-garcia",
@@ -5140,7 +5285,8 @@ const PLAYERS = [
     "age": 25,
     "seasonNote": "",
     "notes": "",
-    "potential": 7
+    "potential": 7,
+    "nameEn": "Eric García"
   },
   {
     "id": "cancelo",
@@ -5173,7 +5319,8 @@ const PLAYERS = [
     "age": 32,
     "seasonNote": "",
     "notes": "",
-    "potential": 6
+    "potential": 6,
+    "nameEn": "João Cancelo"
   },
   {
     "id": "pedri",
@@ -5206,7 +5353,8 @@ const PLAYERS = [
     "age": 23,
     "seasonNote": "",
     "notes": "",
-    "potential": 9
+    "potential": 9,
+    "nameEn": "Pedri"
   },
   {
     "id": "rodri",
@@ -5240,7 +5388,8 @@ const PLAYERS = [
     "age": 30,
     "seasonNote": "",
     "notes": "",
-    "potential": 9
+    "potential": 9,
+    "nameEn": "Rodri"
   },
   {
     "id": "de-jong",
@@ -5273,7 +5422,8 @@ const PLAYERS = [
     "age": 29,
     "seasonNote": "",
     "notes": "",
-    "potential": 8
+    "potential": 8,
+    "nameEn": "Frenkie de Jong"
   },
   {
     "id": "adeyemi",
@@ -5308,7 +5458,8 @@ const PLAYERS = [
     "age": 24,
     "seasonNote": "",
     "notes": "",
-    "potential": 6
+    "potential": 6,
+    "nameEn": "Karim Adeyemi"
   },
   {
     "id": "bardghji",
@@ -5340,7 +5491,8 @@ const PLAYERS = [
     "age": 20,
     "seasonNote": "",
     "notes": "",
-    "potential": 4
+    "potential": 4,
+    "nameEn": "Roony Bardghji"
   },
   {
     "id": "raphinha",
@@ -5374,7 +5526,8 @@ const PLAYERS = [
     "age": 29,
     "seasonNote": "",
     "notes": "",
-    "potential": 8
+    "potential": 8,
+    "nameEn": "Raphinha"
   },
   {
     "id": "anthony-gordon",
@@ -5407,7 +5560,8 @@ const PLAYERS = [
     "age": 25,
     "seasonNote": "",
     "notes": "",
-    "potential": 6
+    "potential": 6,
+    "nameEn": "Anthony Gordon"
   },
   {
     "id": "gabriel-jesus",
@@ -5439,7 +5593,8 @@ const PLAYERS = [
     "age": 29,
     "seasonNote": "",
     "notes": "",
-    "potential": 5
+    "potential": 5,
+    "nameEn": "Gabriel Jesus"
   }
 ];
 
@@ -5490,13 +5645,190 @@ function effectivePotential(p) {
   return Math.max(1, Math.min(10, v));
 }
 
-const POS_LABELS = {
-  GK:'שוער', CB:'בלם', LB:'מגן שמאל', RB:'מגן ימין',
-  DM:'קשר אחורי', CM:'קשר מרכזי', AM:'קשר התקפי',
-  LW:'כנף שמאל', RW:'כנף ימין', ST:'חלוץ'
+// ---------- i18n ----------
+let currentLang = 'he';
+
+const I18N = {
+  he: {
+    appTitle: 'לה מאסיה טרקר',
+    appSubtitle: 'מעקב עצמאי אחר בוגרי האקדמיה של ברצלונה ושחקני האקדמיה הנוכחיים: 59 בוגרים (49 מוצגים כברירת מחדל, 10 שפרשו מוצגים באפשרות מיוחדת) + 79 שחקני אקדמיה בני 16+ + 16 שחקני הקבוצה הראשונה שהגיעו מחוץ ללה מאסיה (מוצגים באפשרות מיוחדת). סה״כ 154 שחקנים במאגר. כלי לבניית מערך חלומי מכלל השחקנים.',
+    badgeSnapshot: 'תמונת מצב: 27.9.2026',
+    badgeSeason: 'סגל האקדמיה: עונת 2026/27',
+    badgeIndependent: 'עצמאי · לא קשור ל־FC Barcelona',
+    tabPlayers: 'שחקנים', tabSquad: 'בונה מערך', tabMatch: 'משחק',
+    searchPlaceholder: 'חיפוש חופשי: שם שחקן או מועדון',
+    optAllGroups: 'כל הקבוצות', groupGraduate: 'בוגרים', groupAtletic: 'בארסה אתלטיק',
+    groupJuvenilA: 'נוער א׳', groupJuvenilB: 'נוער ב׳', groupFirstTeam: 'קבוצה ראשונה (חתימות)',
+    optAllPositions: 'כל העמדות',
+    posGK:'שוער', posCB:'בלם', posLB:'מגן שמאל', posRB:'מגן ימין', posDM:'קשר אחורי',
+    posCM:'קשר מרכזי', posAM:'קשר התקפי', posLW:'כנף שמאל', posRW:'כנף ימין', posST:'חלוץ',
+    optAllStatuses: 'כל המצבים', statusActive: 'פעיל', statusAcademy: 'באקדמיה',
+    statusFreeAgent: 'ללא מועדון', statusRetired: 'פרש',
+    optAllLeagues: 'כל הליגות',
+    labelIncludeRetired: 'הצג גם שחקנים שפרשו',
+    labelIncludeFirstTeam: 'הצג גם שחקני קבוצה ראשונה שלא מלה מאסיה',
+    resultCount: (n, total) => `${n} שחקנים מוצגים מתוך ${total}`,
+    btnClearSquad: 'אפס מערך',
+    btnRandomUnused: 'מלא אקראית — שחקנים שלא נבחרו עדיין',
+    btnRandomAll: 'מלא אקראית — מכלל השחקנים',
+    btnCopySquad: 'העתק מערך לשיתוף',
+    teamNamePlaceholder: 'שם הקבוצה (למשל: הרכב א׳)',
+    btnSaveTeam: 'שמור קבוצה',
+    pickerSearchPlaceholder: 'חיפוש שם',
+    pickerShowAll: 'הצג את כל השחקנים (לא רק לעמדה זו)',
+    pickerHeaderFor: (pos) => `בחר שחקן לעמדת ${pos}`,
+    btnSimMatch: 'סמלץ תוצאה (חד־פעמי, לא משפיע על פוטנציאלים)',
+    btnSeasonStart: 'התחל סדרת משחקים חדשה',
+    btnSeasonPlay: 'שחק משחק נוסף בסדרה',
+    btnSeasonReset: 'אפס סדרה (חזרה לפוטנציאלים המקוריים)',
+    footerText: 'לה מאסיה טרקר — מסמך תיעוד עצמאי · לא קשור ל־FC Barcelona · נוצר 27.9.2026',
+    emptyHint: 'לא נבחרה קבוצה. עברו לטאב "בונה מערך", בנו הרכב מלא (ידנית או אקראית) ושמרו אותו בשם.',
+    matchTeam1Default: 'קבוצה 1', matchTeam2Default: 'קבוצה 2',
+    selectTeamPlaceholder: '— בחר קבוצה —',
+    noTeamsSaved: 'אין עדיין קבוצות שמורות.',
+    savedTeamsPrefix: 'קבוצות שמורות: ',
+    needTeamName: 'יש לתת שם לקבוצה לפני השמירה',
+    teamUpdated: (n) => `הקבוצה "${n}" עודכנה`,
+    teamSaved: (n, count) => `הקבוצה "${n}" נשמרה (סה״כ ${count} קבוצות שמורות)`,
+    needFullSquad: (filled) => `יש למלא את כל 11 העמדות במערך (מולאו ${filled})`,
+    randomFilledPartial: (n) => `המערך מולא אקראית, אבל ${n} עמדות נשארו ריקות (אין מספיק שחקנים פנויים לעמדה)`,
+    randomFilledUnused: 'המערך מולא אקראית משחקנים שלא נבחרו עדיין',
+    randomFilledAll: 'המערך מולא אקראית מכלל השחקנים',
+    needTwoTeamsSim: 'יש לבחור שתי קבוצות שמורות (1 ו-2) לפני הסימולציה',
+    needTwoTeamsSeason: 'יש לבחור שתי קבוצות שמורות (1 ו-2) לפני משחק בסדרה',
+    copiedToast: 'הועתק! אפשר להדביק בוואטסאפ או בכל מקום אחר',
+    copySquadHeader: (f) => `ההרכב שלי — לה מאסיה טרקר (${f})`,
+    copySquadFooter: 'נוצר באפליקציית לה מאסיה טרקר (עצמאי, לא קשור ל-FC Barcelona)',
+    fieldAge: 'גיל ותאריך לידה', fieldClubLeague: 'מועדון וליגה נוכחיים', fieldStatus: 'מצב קריירה',
+    fieldContract: 'חוזה', fieldMarketValue: 'שווי שוק', fieldAcademyBg: 'רקע אקדמיה',
+    fieldCareerPath: 'מסלול קריירה', fieldTransfers: 'העברות ודמי העברה', fieldNationalTeam: 'נבחרת',
+    fieldSeasonNote: 'נתון עונתי / מצב משחק', fieldNotes: 'הערות', fieldSources: 'מקורות',
+    unverified: '⚠ לא מאומת',
+    potentialLabel: 'פוטנציאל (הערכה פרטית שלך, לא נתון ממקור חיצוני)',
+    noScore: ' ללא ציון ', clearLabel: ' נקה ',
+    effectiveLabel: (v) => ` (בפועל למשחקים: ${v}) `,
+    attackLabel: 'התקפה', defenseLabel: 'הגנה',
+    assistLabel: (n) => ` — בישול: ${n}`, setPieceLabel: ' — שער מכדור נייח',
+    noGoalsMatch: 'משחק ללא שערים — 0:0',
+    ratingsHeaderA: 'ציוני שחקנים — הרכב א׳', ratingsHeaderB: 'ציוני שחקנים — הרכב ב׳',
+    matchLabelA: 'הרכב א׳', matchLabelB: 'הרכב ב׳',
+    seasonStatusHeader: (n) => `סדרת משחקים — לאחר משחק מספר ${n}`,
+    seasonChangesHeader: 'שינויי פוטנציאל מהמשחק הזה',
+    seasonNoChanges: 'אף פוטנציאל לא זז מספיק כדי להראות שינוי במשחק הזה.',
+    seasonStartToast: 'סדרת משחקים חדשה התחילה — הפוטנציאלים ימשיכו להשתנות מהערכים הנוכחיים',
+    seasonResetToast: 'הסדרה אופסה, הפוטנציאלים חזרו לערכי הבסיס (אקראיים חדשים לשדות הריקים)',
+  },
+  en: {
+    appTitle: 'La Masia Tracker',
+    appSubtitle: 'Independent tracker of FC Barcelona academy graduates and current academy players: 59 graduates (49 shown by default, 10 retired shown via a special toggle) + 79 academy players aged 16+ + 16 current first-team players who came from outside La Masia (shown via a special toggle). 154 players total in the database. A tool for building your dream lineup from all of them.',
+    badgeSnapshot: 'Snapshot: Sep 27, 2026',
+    badgeSeason: 'Academy squad: 2026/27 season',
+    badgeIndependent: 'Independent · Not affiliated with FC Barcelona',
+    tabPlayers: 'Players', tabSquad: 'Squad Builder', tabMatch: 'Match',
+    searchPlaceholder: 'Free search: player name or club',
+    optAllGroups: 'All groups', groupGraduate: 'Graduates', groupAtletic: 'Barça Atlètic',
+    groupJuvenilA: 'Juvenil A', groupJuvenilB: 'Juvenil B', groupFirstTeam: 'First team (signings)',
+    optAllPositions: 'All positions',
+    posGK:'Goalkeeper', posCB:'Centre-back', posLB:'Left-back', posRB:'Right-back', posDM:'Defensive mid',
+    posCM:'Central mid', posAM:'Attacking mid', posLW:'Left winger', posRW:'Right winger', posST:'Striker',
+    optAllStatuses: 'All statuses', statusActive: 'Active', statusAcademy: 'In academy',
+    statusFreeAgent: 'Free agent', statusRetired: 'Retired',
+    optAllLeagues: 'All leagues',
+    labelIncludeRetired: 'Also show retired players',
+    labelIncludeFirstTeam: 'Also show first-team players not from La Masia',
+    resultCount: (n, total) => `Showing ${n} of ${total} players`,
+    btnClearSquad: 'Clear lineup',
+    btnRandomUnused: 'Random fill — players not selected yet',
+    btnRandomAll: 'Random fill — from all players',
+    btnCopySquad: 'Copy lineup to share',
+    teamNamePlaceholder: 'Team name (e.g. Team A)',
+    btnSaveTeam: 'Save team',
+    pickerSearchPlaceholder: 'Search by name',
+    pickerShowAll: 'Show all players (not just this position)',
+    pickerHeaderFor: (pos) => `Pick a player for ${pos}`,
+    btnSimMatch: 'Simulate result (one-off, does not affect potentials)',
+    btnSeasonStart: 'Start a new match series',
+    btnSeasonPlay: 'Play another match in the series',
+    btnSeasonReset: 'Reset series (back to original potentials)',
+    footerText: 'La Masia Tracker — independent fan project · Not affiliated with FC Barcelona · created 27 Sep 2026',
+    emptyHint: 'No team selected. Go to the "Squad Builder" tab, build a full lineup (manually or randomly) and save it under a name.',
+    matchTeam1Default: 'Team 1', matchTeam2Default: 'Team 2',
+    selectTeamPlaceholder: '— choose a team —',
+    noTeamsSaved: 'No teams saved yet.',
+    savedTeamsPrefix: 'Saved teams: ',
+    needTeamName: 'Please give the team a name before saving',
+    teamUpdated: (n) => `Team "${n}" updated`,
+    teamSaved: (n, count) => `Team "${n}" saved (${count} teams saved so far)`,
+    needFullSquad: (filled) => `All 11 positions must be filled (currently ${filled})`,
+    randomFilledPartial: (n) => `The lineup was filled randomly, but ${n} positions stayed empty (not enough available players for that position)`,
+    randomFilledUnused: 'The lineup was filled randomly from players not selected yet',
+    randomFilledAll: 'The lineup was filled randomly from all players',
+    needTwoTeamsSim: 'Please choose two saved teams (1 and 2) before simulating',
+    needTwoTeamsSeason: 'Please choose two saved teams (1 and 2) before playing a match in the series',
+    copiedToast: 'Copied! You can paste it in WhatsApp or anywhere else',
+    copySquadHeader: (f) => `My lineup — La Masia Tracker (${f})`,
+    copySquadFooter: 'Created with La Masia Tracker (independent, not affiliated with FC Barcelona)',
+    fieldAge: 'Age & date of birth', fieldClubLeague: 'Current club & league', fieldStatus: 'Career status',
+    fieldContract: 'Contract', fieldMarketValue: 'Market value', fieldAcademyBg: 'Academy background',
+    fieldCareerPath: 'Career path', fieldTransfers: 'Transfers & fees', fieldNationalTeam: 'National team',
+    fieldSeasonNote: 'Season note / current status', fieldNotes: 'Notes', fieldSources: 'Sources',
+    unverified: '⚠ unverified',
+    potentialLabel: 'Potential (your private estimate, not from an external source)',
+    noScore: ' no score ', clearLabel: ' clear ',
+    effectiveLabel: (v) => ` (effective in matches: ${v}) `,
+    attackLabel: 'Attack', defenseLabel: 'Defense',
+    assistLabel: (n) => ` — assist: ${n}`, setPieceLabel: ' — set-piece goal',
+    noGoalsMatch: 'No goals in this match — 0:0',
+    ratingsHeaderA: 'Player ratings — Team A', ratingsHeaderB: 'Player ratings — Team B',
+    matchLabelA: 'Team A', matchLabelB: 'Team B',
+    seasonStatusHeader: (n) => `Match series — after match number ${n}`,
+    seasonChangesHeader: 'Potential changes from this match',
+    seasonNoChanges: 'No potential moved enough to show a change in this match.',
+    seasonStartToast: 'A new match series has started — potentials will keep evolving from their current values',
+    seasonResetToast: 'The series was reset, potentials are back to their base values (fresh random draws for empty fields)',
+  }
 };
-const GROUP_LABELS = { graduate:'בוגר', atletic:'בארסה אתלטיק', juvenilA:'נוער א׳', juvenilB:'נוער ב׳', firstTeam:'קבוצה ראשונה (חתימות)' };
-const STATUS_LABELS = { active:'פעיל', academy:'באקדמיה', retired:'פרש', free_agent:'ללא מועדון' };
+
+function t(key, ...args) {
+  const entry = I18N[currentLang][key];
+  if (typeof entry === 'function') return entry(...args);
+  return entry != null ? entry : key;
+}
+
+function displayName(p) {
+  if (!p) return '';
+  return (currentLang === 'en' && p.nameEn) ? p.nameEn : p.nameHe;
+}
+
+function applyStaticI18n() {
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    const val = t(key);
+    if (typeof val === 'string') el.textContent = val;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    const val = t(key);
+    if (typeof val === 'string') el.placeholder = val;
+  });
+  document.getElementById('lang-toggle').textContent = currentLang === 'he' ? 'EN' : 'עברית';
+  document.title = t('appTitle');
+}
+
+document.getElementById('lang-toggle').addEventListener('click', () => {
+  currentLang = currentLang === 'he' ? 'en' : 'he';
+  applyStaticI18n();
+  renderPlayersGrid();
+  if (!document.getElementById('view-squad').classList.contains('hidden')) renderPitch();
+  if (!document.getElementById('view-match').classList.contains('hidden')) renderMatchTeams();
+  renderSavedTeamsList();
+});
+
+function POS_LABEL(code) { return I18N[currentLang]['pos'+code] || code; }
+function GROUP_LABEL(code) { return I18N[currentLang]['group'+(code==='juvenilA'?'JuvenilA':code==='juvenilB'?'JuvenilB':code==='firstTeam'?'FirstTeam':code==='graduate'?'Graduate':code==='atletic'?'Atletic':code)] || code; }
+function STATUS_LABEL(code) { return I18N[currentLang]['status'+(code==='free_agent'?'FreeAgent':code.charAt(0).toUpperCase()+code.slice(1))] || code; }
 
 // ---------- state ----------
 let squad = {}; // slotId -> playerId
@@ -5567,7 +5899,7 @@ function getFilteredPlayers() {
   return PLAYERS.filter(p => {
     if (p.careerStatus === 'retired' && !includeRetired && status !== 'retired') return false;
     if (p.group === 'firstTeam' && !includeFirstTeam && group !== 'firstTeam') return false;
-    if (q && !(p.nameHe.toLowerCase().includes(q) || (p.currentClub||'').toLowerCase().includes(q))) return false;
+    if (q && !(p.nameHe.toLowerCase().includes(q) || (p.nameEn && p.nameEn.toLowerCase().includes(q)) || (p.currentClub||'').toLowerCase().includes(q))) return false;
     if (group && p.group !== group) return false;
     if (pos && !p.positions.includes(pos)) return false;
     if (status && p.careerStatus !== status) return false;
@@ -5578,7 +5910,7 @@ function getFilteredPlayers() {
 
 function renderPlayersGrid() {
   const list = getFilteredPlayers();
-  document.getElementById('result-count').textContent = `${list.length} שחקנים מוצגים מתוך ${PLAYERS.length}`;
+  document.getElementById('result-count').textContent = t('resultCount', list.length, PLAYERS.length);
   const grid = document.getElementById('players-grid');
   grid.innerHTML = '';
   list.forEach(p => {
@@ -5586,9 +5918,9 @@ function renderPlayersGrid() {
     card.className = 'card';
     card.onclick = () => openPlayerModal(p.id);
     card.innerHTML = `
-      <div class="name"><span class="status-dot status-${p.careerStatus}"></span>${p.nameHe}</div>
-      <div class="meta">${p.currentClub || ''}<br>${GROUP_LABELS[p.group]} · ${p.age ?? '?'} · ${STATUS_LABELS[p.careerStatus]}</div>
-      <div>${p.positions.map(c=>`<span class="pos-chip">${POS_LABELS[c]||c}</span>`).join('')}</div>
+      <div class="name"><span class="status-dot status-${p.careerStatus}"></span>${displayName(p)}</div>
+      <div class="meta">${p.currentClub || ''}<br>${GROUP_LABEL(p.group)} · ${p.age ?? '?'} · ${STATUS_LABEL(p.careerStatus)}</div>
+      <div>${p.positions.map(c=>`<span class="pos-chip">${POS_LABEL(c)}</span>`).join('')}</div>
     `;
     grid.appendChild(card);
   });
@@ -5602,7 +5934,7 @@ function renderPlayersGrid() {
 // ---------- player modal ----------
 function field(label, value, unverified) {
   if (!value) return '';
-  return `<div class="field"><div class="label">${label}${unverified ? '<span class="unverified">⚠ לא מאומת</span>' : ''}</div><div class="value">${value}</div></div>`;
+  return `<div class="field"><div class="label">${label}${unverified ? `<span class="unverified">${t('unverified')}</span>` : ''}</div><div class="value">${value}</div></div>`;
 }
 
 function openPlayerModal(id) {
@@ -5613,26 +5945,26 @@ function openPlayerModal(id) {
   const ntUnverified = !p.nationalTeamVerified;
   modal.innerHTML = `
     <button class="closeBtn" onclick="closePlayerModal()">✕</button>
-    <h2>${p.nameHe}</h2>
-    <div class="meta" style="color:#8fa89c;font-size:12px;">${GROUP_LABELS[p.group]} · ${p.positions.map(c=>POS_LABELS[c]||c).join(' / ')}</div>
-    ${field('גיל ותאריך לידה', `${p.age ?? '?'} (${p.birthDate || 'לא אומת'})`)}
-    ${field('מועדון וליגה נוכחיים', `${p.currentClub || ''} · ${p.league || ''}`)}
-    ${field('מצב קריירה', STATUS_LABELS[p.careerStatus])}
-    ${field('חוזה', p.contract)}
-    ${field('שווי שוק', p.marketValue, mvUnverified)}
-    ${field('רקע אקדמיה', p.academyBackground)}
-    ${field('מסלול קריירה', p.careerPath)}
-    ${field('העברות ודמי העברה', p.transfers)}
-    ${field('נבחרת', p.nationalTeam, ntUnverified)}
-    ${field('נתון עונתי / מצב משחק', p.seasonNote)}
-    ${field('הערות', p.notes)}
+    <h2>${displayName(p)}</h2>
+    <div class="meta" style="color:#8fa89c;font-size:12px;">${GROUP_LABEL(p.group)} · ${p.positions.map(c=>POS_LABEL(c)).join(' / ')}</div>
+    ${field(t('fieldAge'), `${p.age ?? '?'} (${p.birthDate || (currentLang==='he'?'לא אומת':'unverified')})`)}
+    ${field(t('fieldClubLeague'), `${p.currentClub || ''} · ${p.league || ''}`)}
+    ${field(t('fieldStatus'), STATUS_LABEL(p.careerStatus))}
+    ${field(t('fieldContract'), p.contract)}
+    ${field(t('fieldMarketValue'), p.marketValue, mvUnverified)}
+    ${field(t('fieldAcademyBg'), p.academyBackground)}
+    ${field(t('fieldCareerPath'), p.careerPath)}
+    ${field(t('fieldTransfers'), p.transfers)}
+    ${field(t('fieldNationalTeam'), p.nationalTeam, ntUnverified)}
+    ${field(t('fieldSeasonNote'), p.seasonNote)}
+    ${field(t('fieldNotes'), p.notes)}
     <div class="field sources">
-      <div class="label">מקורות</div>
+      <div class="label">${t('fieldSources')}</div>
       <a href="${p.mainSource}" target="_blank">${p.mainSource}</a>
       ${(p.extraSources||[]).map(s=>`<a href="${s}" target="_blank">${s}</a>`).join('')}
     </div>
     <div class="potential-box">
-      <div class="label">פוטנציאל (הערכה פרטית שלך, לא נתון ממקור חיצוני)</div>
+      <div class="label">${t('potentialLabel')}</div>
       <div class="potential-stars" id="potential-stars"></div>
     </div>
   `;
@@ -5666,18 +5998,18 @@ function renderPotentialStars(p) {
     el.appendChild(btn);
   }
   const valueLabel = document.createElement('span');
-  valueLabel.textContent = cur ? (' ' + cur + '/10 ') : ' ללא ציון ';
+  valueLabel.textContent = cur ? (' ' + cur + '/10 ') : t('noScore');
   valueLabel.style.fontSize = '12px'; valueLabel.style.color = '#e9c46a'; valueLabel.style.margin = '0 8px';
   el.appendChild(valueLabel);
   const eff = effectivePotential(p);
   if (cur && Math.abs(eff - cur) > 0.01) {
     const effLabel = document.createElement('span');
-    effLabel.textContent = ' (בפועל למשחקים: ' + eff.toFixed(2) + ') ';
+    effLabel.textContent = t('effectiveLabel', eff.toFixed(2));
     effLabel.style.fontSize = '11px'; effLabel.style.color = '#8fa89c';
     el.appendChild(effLabel);
   }
   const clear = document.createElement('span');
-  clear.textContent = ' נקה ';
+  clear.textContent = t('clearLabel');
   clear.style.fontSize = '11px'; clear.style.color = '#8fa89c'; clear.style.cursor = 'pointer';
   clear.onclick = () => { CURRENT_POTENTIAL[p.id] = null; renderPotentialStars(p); };
   el.appendChild(clear);
@@ -5710,8 +6042,8 @@ function renderPitch() {
     div.innerHTML = `
       <span class="clearX">✕</span>
       <div class="chip">
-        <div class="posLabel">${POS_LABELS[slot.pos]}</div>
-        <div class="pname">${player ? shortName(player.nameHe) : '+'}</div>
+        <div class="posLabel">${POS_LABEL(slot.pos)}</div>
+        <div class="pname">${player ? shortName(displayName(player)) : '+'}</div>
       </div>
     `;
     div.querySelector('.clearX').onclick = (e) => { e.stopPropagation(); delete squad[slot.id]; renderPitch(); };
@@ -5724,7 +6056,7 @@ function openPicker(slot) {
   activeSlotId = slot.id;
   renderPitch();
   document.getElementById('picker-panel').classList.remove('hidden');
-  document.getElementById('picker-header').textContent = `בחר שחקן לעמדת ${POS_LABELS[slot.pos]}`;
+  document.getElementById('picker-header').textContent = t('pickerHeaderFor', POS_LABEL(slot.pos));
   document.getElementById('picker-show-all').checked = false;
   document.getElementById('picker-search').value = '';
   renderPickerList(slot);
@@ -5736,7 +6068,7 @@ function renderPickerList(slot) {
   const q = document.getElementById('picker-search').value.trim().toLowerCase();
   const usedIds = new Set(Object.values(squad));
   let list = PLAYERS.filter(p => showAll || p.positions.includes(slot.pos));
-  if (q) list = list.filter(p => p.nameHe.toLowerCase().includes(q));
+  if (q) list = list.filter(p => p.nameHe.toLowerCase().includes(q) || (p.nameEn && p.nameEn.toLowerCase().includes(q)));
   const listEl = document.getElementById('picker-list');
   listEl.innerHTML = '';
   list.forEach(p => {
@@ -5744,7 +6076,7 @@ function renderPickerList(slot) {
     row.className = 'picker-row';
     const already = usedIds.has(p.id) && squad[slot.id] !== p.id;
     row.style.opacity = already ? '0.4' : '1';
-    row.innerHTML = `<span>${p.nameHe}</span><span class="picker-meta">${p.positions.map(c=>POS_LABELS[c]).join('/')} · ${GROUP_LABELS[p.group]}</span>`;
+    row.innerHTML = `<span>${displayName(p)}</span><span class="picker-meta">${p.positions.map(c=>POS_LABEL(c)).join('/')} · ${GROUP_LABEL(p.group)}</span>`;
     if (!already) {
       row.onclick = () => {
         // remove player from any other slot first
@@ -5769,17 +6101,17 @@ document.getElementById('btn-clear-squad').onclick = () => {
 document.getElementById('btn-copy-squad').onclick = () => {
   const slots = FORMATIONS[currentFormationKey];
   const fLabel = {'433':'4-3-3','4231':'4-2-3-1','442':'4-4-2'}[currentFormationKey];
-  let text = `ההרכב שלי — לה מאסיה טרקר (${fLabel})\n\n`;
+  let text = `${t('copySquadHeader', fLabel)}\n\n`;
   slots.forEach(slot => {
     const p = squad[slot.id] ? playerById(squad[slot.id]) : null;
-    text += `${POS_LABELS[slot.pos]}: ${p ? p.nameHe : '—'}\n`;
+    text += `${POS_LABEL(slot.pos)}: ${p ? displayName(p) : '—'}\n`;
   });
-  text += `\nנוצר באפליקציית לה מאסיה טרקר (עצמאי, לא קשור ל-FC Barcelona)`;
-  navigator.clipboard.writeText(text).then(showToast('הועתק! אפשר להדביק בוואטסאפ או בכל מקום אחר')).catch(()=>{
+  text += `\n${t('copySquadFooter')}`;
+  navigator.clipboard.writeText(text).then(showToast(t('copiedToast'))).catch(()=>{
     const ta = document.createElement('textarea');
     ta.value = text; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
-    showToast('הועתק!');
+    showToast(t('copiedToast'));
   });
 };
 function showToast(msg) {
@@ -5799,42 +6131,42 @@ function captureCurrentTeam() {
   const slots = FORMATIONS[currentFormationKey];
   const filledCount = slots.filter(s => squad[s.id]).length;
   if (filledCount < 11) {
-    showToast(`יש למלא את כל 11 העמדות במערך (מולאו ${filledCount})`)();
+    showToast(t('needFullSquad', filledCount))();
     return null;
   }
   return { formationKey: currentFormationKey, squad: {...squad} };
 }
 
-function findSavedTeam(name) { return savedTeams.find(t => t.name === name); }
+function findSavedTeam(name) { return savedTeams.find(tm => tm.name === name); }
 
 document.getElementById('btn-save-team').onclick = () => {
   const nameInput = document.getElementById('team-name-input');
   const name = nameInput.value.trim();
-  if (!name) { showToast('יש לתת שם לקבוצה לפני השמירה')(); return; }
-  const t = captureCurrentTeam();
-  if (!t) return;
-  t.name = name;
+  if (!name) { showToast(t('needTeamName'))(); return; }
+  const team = captureCurrentTeam();
+  if (!team) return;
+  team.name = name;
   const existing = findSavedTeam(name);
   if (existing) {
-    existing.formationKey = t.formationKey;
-    existing.squad = t.squad;
-    showToast(`הקבוצה "${name}" עודכנה`)();
+    existing.formationKey = team.formationKey;
+    existing.squad = team.squad;
+    showToast(t('teamUpdated', name))();
   } else {
-    savedTeams.push(t);
-    showToast(`הקבוצה "${name}" נשמרה (סה״כ ${savedTeams.length} קבוצות שמורות)`)();
+    savedTeams.push(team);
+    showToast(t('teamSaved', name, savedTeams.length))();
   }
   renderSavedTeamsList();
 };
 
 function renderSavedTeamsList() {
   const el = document.getElementById('saved-teams-list');
-  if (!savedTeams.length) { el.textContent = 'אין עדיין קבוצות שמורות.'; return; }
-  el.innerHTML = 'קבוצות שמורות: ' + savedTeams.map(t =>
-    `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px;padding:2px 8px;border:1px solid #2d4038;border-radius:12px;">${t.name}<span data-del="${t.name}" style="cursor:pointer;color:#e07a5f;">✕</span></span>`
+  if (!savedTeams.length) { el.textContent = t('noTeamsSaved'); return; }
+  el.innerHTML = t('savedTeamsPrefix') + savedTeams.map(tm =>
+    `<span style="display:inline-flex;align-items:center;gap:4px;margin:2px 6px;padding:2px 8px;border:1px solid #2d4038;border-radius:12px;">${tm.name}<span data-del="${tm.name}" style="cursor:pointer;color:#e07a5f;">✕</span></span>`
   ).join('');
   el.querySelectorAll('[data-del]').forEach(span => {
     span.onclick = () => {
-      savedTeams = savedTeams.filter(t => t.name !== span.dataset.del);
+      savedTeams = savedTeams.filter(tm => tm.name !== span.dataset.del);
       renderSavedTeamsList();
     };
   });
@@ -5866,9 +6198,9 @@ function randomFillSquad(restrictToUnused) {
   activeSlotId = null;
   renderPitch();
   if (skipped > 0) {
-    showToast(`המערך מולא אקראית, אבל ${skipped} עמדות נשארו ריקות (אין מספיק שחקנים פנויים לעמדה)`)();
+    showToast(t('randomFilledPartial', skipped))();
   } else {
-    showToast(restrictToUnused ? 'המערך מולא אקראית משחקנים שלא נבחרו עדיין' : 'המערך מולא אקראית מכלל השחקנים')();
+    showToast(restrictToUnused ? t('randomFilledUnused') : t('randomFilledAll'))();
   }
 }
 
@@ -5878,20 +6210,20 @@ document.getElementById('btn-random-all').onclick = () => randomFillSquad(false)
 function renderTeamList(team, elId) {
   const el = document.getElementById(elId);
   if (!team) {
-    el.innerHTML = '<div class="empty-hint">לא נבחרה קבוצה. עברו לטאב "בונה מערך", בנו הרכב מלא (ידנית או אקראית) ושמרו אותו בשם.</div>';
+    el.innerHTML = `<div class="empty-hint">${t('emptyHint')}</div>`;
     return;
   }
   const slots = FORMATIONS[team.formationKey];
   el.innerHTML = slots.map(slot => {
     const p = team.squad[slot.id] ? playerById(team.squad[slot.id]) : null;
-    return `<div>${POS_LABELS[slot.pos]}: <b>${p ? p.nameHe : '—'}</b></div>`;
+    return `<div>${POS_LABEL(slot.pos)}: <b>${p ? displayName(p) : '—'}</b></div>`;
   }).join('');
 }
 
 function populateTeamSelect(selectId, selectedName) {
   const sel = document.getElementById(selectId);
-  sel.innerHTML = '<option value="">— בחר קבוצה —</option>' +
-    savedTeams.map(t => `<option value="${t.name}" ${t.name===selectedName?'selected':''}>${t.name}</option>`).join('');
+  sel.innerHTML = `<option value="">${t('selectTeamPlaceholder')}</option>` +
+    savedTeams.map(tm => `<option value="${tm.name}" ${tm.name===selectedName?'selected':''}>${tm.name}</option>`).join('');
 }
 
 function renderMatchTeams() {
@@ -5899,8 +6231,8 @@ function renderMatchTeams() {
   populateTeamSelect('select-team-b', selectedTeamBName);
   const teamA = selectedTeamAName ? findSavedTeam(selectedTeamAName) : null;
   const teamB = selectedTeamBName ? findSavedTeam(selectedTeamBName) : null;
-  document.getElementById('match-team-a-title').textContent = teamA ? teamA.name : 'קבוצה 1';
-  document.getElementById('match-team-b-title').textContent = teamB ? teamB.name : 'קבוצה 2';
+  document.getElementById('match-team-a-title').textContent = teamA ? teamA.name : t('matchTeam1Default');
+  document.getElementById('match-team-b-title').textContent = teamB ? teamB.name : t('matchTeam2Default');
   renderTeamList(teamA, 'match-team-a-list');
   renderTeamList(teamB, 'match-team-b-list');
 }
@@ -6047,36 +6379,36 @@ function computeMatchRatings(teamA, teamB, events, goalsA, goalsB) {
 }
 
 function renderRatingsTable(list) {
-  return list.map(r => `<div class="event-row">${POS_LABELS[r.pos]||r.pos}: <b>${r.p.nameHe}</b> — <span style="color:${r.rating>=7?'#7fd9ad':r.rating>=5?'#e9c46a':'#e07a5f'}">${r.rating.toFixed(1)}</span></div>`).join('');
+  return list.map(r => `<div class="event-row">${POS_LABEL(r.pos)}: <b>${displayName(r.p)}</b> — <span style="color:${r.rating>=7?'#7fd9ad':r.rating>=5?'#e9c46a':'#e07a5f'}">${r.rating.toFixed(1)}</span></div>`).join('');
 }
 
 function renderMatchResult(result) {
   const box = document.getElementById('match-result');
   const eventsHtml = result.events.length
     ? result.events.map(e => {
-        const teamLabel = e.team==='A' ? 'הרכב א׳' : 'הרכב ב׳';
-        const assistTxt = e.assist ? ` — בישול: ${e.assist.nameHe}` : (e.setPiece ? ' — שער מכדור נייח' : '');
-        return `<div class="event-row"><span class="event-minute">${e.minute}'</span> ⚽ ${e.scorer ? e.scorer.nameHe : '—'} (${teamLabel})${assistTxt}</div>`;
+        const teamLabel = e.team==='A' ? t('matchLabelA') : t('matchLabelB');
+        const assistTxt = e.assist ? t('assistLabel', displayName(e.assist)) : (e.setPiece ? t('setPieceLabel') : '');
+        return `<div class="event-row"><span class="event-minute">${e.minute}'</span> ⚽ ${e.scorer ? displayName(e.scorer) : '—'} (${teamLabel})${assistTxt}</div>`;
       }).join('')
-    : '<div class="event-row">משחק ללא שערים — 0:0</div>';
+    : `<div class="event-row">${t('noGoalsMatch')}</div>`;
   box.innerHTML = `
     <div class="match-score">
-      <span class="team-name">הרכב א׳</span>
+      <span class="team-name">${t('matchLabelA')}</span>
       ${result.goalsA} : ${result.goalsB}
-      <span class="team-name">הרכב ב׳</span>
+      <span class="team-name">${t('matchLabelB')}</span>
     </div>
     <div class="match-ratings">
-      <div>הרכב א׳ — התקפה ${result.ratingsA.attack.toFixed(1)} · הגנה ${result.ratingsA.defense.toFixed(1)}</div>
-      <div>הרכב ב׳ — התקפה ${result.ratingsB.attack.toFixed(1)} · הגנה ${result.ratingsB.defense.toFixed(1)}</div>
+      <div>${t('matchLabelA')} — ${t('attackLabel')} ${result.ratingsA.attack.toFixed(1)} · ${t('defenseLabel')} ${result.ratingsA.defense.toFixed(1)}</div>
+      <div>${t('matchLabelB')} — ${t('attackLabel')} ${result.ratingsB.attack.toFixed(1)} · ${t('defenseLabel')} ${result.ratingsB.defense.toFixed(1)}</div>
     </div>
     <div class="match-events">${eventsHtml}</div>
     <div class="match-teams" style="margin-top:14px;">
       <div class="match-team-box">
-        <div class="match-team-title">ציוני שחקנים — הרכב א׳</div>
+        <div class="match-team-title">${t('ratingsHeaderA')}</div>
         <div class="match-team-list">${renderRatingsTable(result.ratingsTable.a)}</div>
       </div>
       <div class="match-team-box">
-        <div class="match-team-title">ציוני שחקנים — הרכב ב׳</div>
+        <div class="match-team-title">${t('ratingsHeaderB')}</div>
         <div class="match-team-list">${renderRatingsTable(result.ratingsTable.b)}</div>
       </div>
     </div>
@@ -6087,7 +6419,7 @@ document.getElementById('btn-sim-match').onclick = () => {
   const teamA = selectedTeamAName ? findSavedTeam(selectedTeamAName) : null;
   const teamB = selectedTeamBName ? findSavedTeam(selectedTeamBName) : null;
   if (!teamA || !teamB) {
-    showToast('יש לבחור שתי קבוצות שמורות (1 ו-2) לפני הסימולציה')();
+    showToast(t('needTwoTeamsSim'))();
     return;
   }
   const result = simulateMatch(teamA, teamB);
@@ -6143,13 +6475,13 @@ function applyPostMatchDevelopment(teamA, teamB, result) {
 function renderSeasonStatus(changes) {
   const el = document.getElementById('season-status');
   if (!seasonActive && seasonMatchCount === 0) { el.innerHTML = ''; return; }
-  let html = `<div class="event-row"><b>סדרת משחקים — לאחר משחק מספר ${seasonMatchCount}</b></div>`;
+  let html = `<div class="event-row"><b>${t('seasonStatusHeader', seasonMatchCount)}</b></div>`;
   if (changes && changes.length) {
-    html += '<div class="match-team-box" style="margin-top:8px;"><div class="match-team-title">שינויי פוטנציאל מהמשחק הזה</div><div class="match-team-list">';
-    html += changes.map(c => `<div>${c.p.nameHe}: ${c.before.toFixed(2)} ← ${c.after.toFixed(2)} (${c.delta>=0?'+':''}${c.delta.toFixed(2)})</div>`).join('');
+    html += `<div class="match-team-box" style="margin-top:8px;"><div class="match-team-title">${t('seasonChangesHeader')}</div><div class="match-team-list">`;
+    html += changes.map(c => `<div>${displayName(c.p)}: ${c.before.toFixed(2)} ← ${c.after.toFixed(2)} (${c.delta>=0?'+':''}${c.delta.toFixed(2)})</div>`).join('');
     html += '</div></div>';
   } else if (changes) {
-    html += '<div class="event-row">אף פוטנציאל לא זז מספיק כדי להראות שינוי במשחק הזה.</div>';
+    html += `<div class="event-row">${t('seasonNoChanges')}</div>`;
   }
   el.innerHTML = html;
 }
@@ -6158,14 +6490,14 @@ document.getElementById('btn-season-start').onclick = () => {
   seasonActive = true;
   seasonMatchCount = 0;
   renderSeasonStatus(null);
-  showToast('סדרת משחקים חדשה התחילה — הפוטנציאלים ימשיכו להשתנות מהערכים הנוכחיים')();
+  showToast(t('seasonStartToast'))();
 };
 
 document.getElementById('btn-season-play').onclick = () => {
   const teamA = selectedTeamAName ? findSavedTeam(selectedTeamAName) : null;
   const teamB = selectedTeamBName ? findSavedTeam(selectedTeamBName) : null;
   if (!teamA || !teamB) {
-    showToast('יש לבחור שתי קבוצות שמורות (1 ו-2) לפני משחק בסדרה')();
+    showToast(t('needTwoTeamsSeason'))();
     return;
   }
   if (!seasonActive) { seasonActive = true; seasonMatchCount = 0; }
@@ -6181,10 +6513,11 @@ document.getElementById('btn-season-reset').onclick = () => {
   seasonActive = false;
   seasonMatchCount = 0;
   renderSeasonStatus(null);
-  showToast('הסדרה אופסה, הפוטנציאלים חזרו לערכי הבסיס (אקראיים חדשים לשדות הריקים)')();
+  showToast(t('seasonResetToast'))();
 };
 
 // ---------- init ----------
+applyStaticI18n();
 populateLeagueFilter();
 renderPlayersGrid();
 renderPitch();
