@@ -1,24 +1,24 @@
 /* ===================== Data ===================== */
 const STATIONS = [
   { id:1, name:"מיקוד קרוב-רחוק", duration:40, equipment:"אגודל או עט",
-    hint:"קרוב לאגודל, רחוק לעצם — מחליפים כל 5 שניות",
+    hint:"מבט מקרוב למבט מרחוק — מחליפים כל 5 שניות",
     steps:[
-      "עמדו זקוף, במרחק של כ-30 סנטימטר מהפנים, והחזיקו אגודל ישר מול העיניים.",
-      "הביטו בקצה האגודל ומנו לאט עד 5, עד שהוא נראה חד לגמרי.",
-      "הזיזו את המבט לעצם רחוק, לפחות שלושה מטרים, ומנו עד 5.",
-      "חזרו לאגודל. זו חזרה אחת. צאו כשמונה חזרות עד סוף התחנה."
+      "שבו או עמדו זקופים. החזיקו את האגודל מול העיניים, במרחק של כ-30 סנטימטר מהפנים.",
+      "הביטו בקצה האגודל וספרו לאט עד חמש, עד שהוא נראה ברור וחד.",
+      "העבירו את המבט לעצם שנמצא במרחק של לפחות שלושה מטרים, וספרו עד חמש.",
+      "חזרו לאגודל. זו חזרה אחת. בצעו כשמונה חזרות עד סוף התחנה."
     ],
     pressureNote:"אם יש לחץ, הרפו מצח וכתפיים.",
-    feel:"נעילה קצרה וחדה בכל מיקוד",
+    feel:"מיקוד קצר וברור בכל פעם",
     anim:"focus",
     cues:[{t:0,text:"מבט קרוב"},{t:5,text:"מבט רחוק"},{t:10,text:"מבט קרוב"},{t:15,text:"מבט רחוק"},{t:20,text:"מבט קרוב"},{t:25,text:"מבט רחוק"},{t:30,text:"מבט קרוב"},{t:35,text:"מבט רחוק"}]
   },
-  { id:2, name:"מעקב בתבנית שמונה", duration:40, equipment:null,
-    hint:"העיניים עוקבות אחרי נקודה, הראש לא זז",
+  { id:2, name:"מעקב בתבנית שמונה שוכבת", duration:40, equipment:null,
+    hint:"העיניים עוקבות אחר נקודה, והראש נשאר יציב",
     steps:[
-      "שבו יציב, ראש נינוח מולכם, בלי להזיז את הראש. כל התנועה בעיניים בלבד.",
-      "דמיינו שמונה גדולה שוכבת על הצד, במרחק מטר עד שני מטרים מולכם.",
-      "עקבו אחרי הנקודה לאורך כל הלולאה, לאיטיות ובלי לקפוץ קדימה.",
+      "שבו בנוחות והביטו קדימה. השאירו את הראש יציב, ובצעו את כל התנועה בעיניים בלבד.",
+      "דמיינו את הספרה שמונה שוכבת על הצד, במרחק של מטר עד שני מטרים מולכם.",
+      "עקבו באיטיות אחר הנקודה לאורך כל הלולאה, בלי לקפוץ קדימה.",
       "המשיכו באותו קצב לצד השני."
     ],
     pressureNote:"אם העיניים מקפיצות, האטו את הקצב.",
@@ -26,55 +26,55 @@ const STATIONS = [
     anim:"figure8",
     cues:[{t:20,text:"מחליפים כיוון"}]
   },
-  { id:3, name:"סיבובי עיניים", duration:30, equipment:null,
-    hint:"עיגול איטי של המבט, הכיוון מתהפך באמצע",
+  { id:3, name:"סיבובי עיניים עדינים", duration:30, equipment:null,
+    hint:"מניעים את המבט במעגל איטי, ומחליפים כיוון באמצע",
     steps:[
       "שבו יציב, ראש יציב, כתפיים רפויות, מבט קדימה.",
-      "הובילו את המבט למעלה, ואז בעיגול איטי: לצד, למטה, לצד השני וחזרה למעלה.",
-      "המשיכו לסבב לצד השני.",
-      "עצרו ונשמו אם מסתחררים. כשלושה עיגולים לכל כיוון מספיקים."
+      "העבירו את המבט למעלה, ואז בתנועה מעגלית איטית: הצידה, למטה, לצד השני וחזרה למעלה.",
+      "המשיכו לעוד סבב בכיוון ההפוך.",
+      "אם אתם מרגישים סחרחורת, עצרו ונשמו. כשלושה מעגלים לכל כיוון מספיקים."
     ],
     pressureNote:"בלי מאמץ, ולעולם לא כאב.",
-    feel:"מתיחה נעימה בקצוות הראייה",
+    feel:"מתיחה עדינה בקצוות שדה הראייה",
     anim:"rotate",
     cues:[{t:15,text:"מחליפים כיוון"},{t:27,text:"עצרו ונשמו אם צריך"}]
   },
-  { id:4, name:"מצמוץ והפרהה", duration:30, equipment:null,
-    hint:"עשרה מצמוצים רכים ומלאים, וחזרה",
+  { id:4, name:"מצמוץ והרפיה", duration:30, equipment:null,
+    hint:"עשרה מצמוצים רכים ומלאים, ולאחריהם הרפיה",
     steps:[
-      "הביטו קדימה ומצמצו עשר פעמים בקצב טבעי: מצמוץ מלא ורך, בלי לכווץ.",
-      "עצמו עיניים בעדינות למשך שתי נשימות ארוכות.",
-      "פתחו וחזרו על אותו דבר שוב, כשלושה סבבים."
+      "הביטו קדימה ומצמצו עשר פעמים בקצב טבעי. מצמצים באופן מלא ורך, בלי לכווץ את העיניים.",
+      "עצמו את העיניים בעדינות למשך שתי נשימות ארוכות.",
+      "פקחו את העיניים וחזרו על הרצף, עד שלושה סבבים."
     ],
     pressureNote:null,
-    feel:"רעננות ולחות קלה בעיניים",
+    feel:"תחושת רעננות ולחות קלה בעיניים",
     anim:"blink",
     cues:[{t:0,text:"מצמצו בעדינות עשר פעמים"},{t:10,text:"עצמו עיניים ונשמו"},{t:20,text:"פתחו וחזרו שוב"}]
   },
-  { id:5, name:"מנוחה בכפות הידיים", duration:45, equipment:null,
-    hint:"חושך מלא, בלי לחץ על העיניים",
+  { id:5, name:"הרפיה בכפות הידיים", duration:45, equipment:null,
+    hint:"חושך נעים, בלי לחץ על העיניים",
     steps:[
       "שפשפו את כפות הידיים זו בזו במשך כמה שניות, עד שהן מתחממות מעט.",
-      "עצמו עיניים והניחו את הידיים כקעריות עליהן, בלי לגעת בעיניים ובלי לחץ.",
-      "שחררו את המצח, הלסת והכתפיים. נשמו לאט חמש עד שש נשימות ארוכות.",
-      "בסיום הורידו קודם את הידיים, ורק אז פקחו עיניים לאט לאט."
+      "עצמו את העיניים והניחו את כפות הידיים מעליהן כקעריות, בלי לגעת בעיניים ובלי להפעיל לחץ.",
+      "הרפו את המצח, הלסת והכתפיים. נשמו לאט חמש עד שש נשימות ארוכות.",
+      "בסיום הורידו קודם את הידיים, ורק לאחר מכן פקחו את העיניים באיטיות."
     ],
     pressureNote:"מרגישים לחץ על העיניים? הרחיקו את הידיים.",
-    feel:"חושך נעים וחום קל",
+    feel:"חושך נעים וחום קל סביב העיניים",
     anim:"palm",
     cues:[{t:0,text:"חממו את כפות הידיים"},{t:10,text:"כסו את העיניים בעדינות"},{t:35,text:"נשמו לאט"}]
   },
-  { id:6, name:"פנסיל פוש-אפ", duration:45, equipment:"עיפרון או עט",
-    hint:"מקרבים לאט, עוצרים לפני כפילות",
+  { id:6, name:"קירוב עיפרון", duration:45, equipment:"עיפרון או עט",
+    hint:"מקרבים את העיפרון באיטיות ועוצרים לפני ראייה כפולה",
     steps:[
-      "החזיקו עיפרון זקוף במרחק זרוע פשוטה מהפנים, בגובה העיניים.",
-      "הביטו בקצה שלו וודאו ששתי העיניים רואות אותו אחד וחד.",
-      "כשהעיניים עוקבות כל הדרך, קרבו אותו לאט מאוד לכיוון קצה האף.",
-      "לא מצליחים לחדד לאחד? עצרו, החזיקו שתי שניות וניסו לחדד בחזרה.",
-      "הרחיקו בחזרה למרחק זרוע. זו חזרה אחת, צאו כשלוש חזרות."
+      "החזיקו עיפרון זקוף, במרחק זרוע מהפנים ובגובה העיניים.",
+      "הביטו בקצה העיפרון וודאו שאתם רואים תמונה אחת וברורה.",
+      "המשיכו להביט בקצהו וקרבו אותו באיטיות רבה לכיוון קצה האף.",
+      "אם התמונה מתחילה להתפצל, עצרו, החזיקו שתי שניות, והרחיקו מעט את העיפרון עד שתראו תמונה אחת.",
+      "הרחיקו את העיפרון בחזרה למרחק זרוע. זו חזרה אחת. בצעו כשלוש חזרות."
     ],
     pressureNote:"כפילות שנשארת או כאב — מפסיקים.",
-    feel:"איסוף עדין של העיניים פנימה",
+    feel:"כינוס עדין של העיניים פנימה",
     anim:"pushup",
     cues:[{t:5,text:"מקרבים לאט"},{t:20,text:"לא מצליחים? מרחיקים ומתחילים שוב"},{t:35,text:"חזרה למרחק זרוע"}]
   },
@@ -82,11 +82,11 @@ const STATIONS = [
     hint:"מבט רחוק ורפוי",
     steps:[
       "הסיטו את המבט מהמסך לגמרי.",
-      "מצאו את העצם הרחוק ביותר שאפשר: סוף מסדרון, בניין או עץ מחוץ לחלון, לפחות כשישה מטרים.",
-      "הביטו בו בריפיון עשרים שניות. אפשר ורצוי לצמצם בחופשיות."
+      "מצאו עצם רחוק ככל האפשר, כמו סוף מסדרון, בניין או עץ מחוץ לחלון, במרחק של לפחות שישה מטרים.",
+      "הביטו בו ברוגע במשך עשרים שניות. אפשר ורצוי למצמץ באופן טבעי."
     ],
     pressureNote:null,
-    feel:"שחרור של תחושת המיקוד הקרוב",
+    feel:"הקלה בתחושת המיקוד הקרוב",
     anim:"faraway",
     cues:[{t:0,text:"הסיטו את המבט מהמסך"},{t:10,text:"מבט רחוק ורפוי"}]
   }
@@ -94,7 +94,7 @@ const STATIONS = [
 
 const STREAK_GRADES = [
   {min:30,label:"אלופי ההפסקות"},
-  {min:15,label:"הדבקה יפה"},
+  {min:15,label:"מתמידים"},
   {min:5,label:"בקצב"},
   {min:1,label:"מתחממים"},
   {min:0,label:"יוצאים לדרך"}
@@ -112,8 +112,14 @@ function loadData(){
 function saveData(d){ localStorage.setItem(STORE_KEY, JSON.stringify(d)); }
 let appData = loadData();
 
-function todayStr(){ return new Date().toISOString().slice(0,10); }
-function daysAgoStr(n){ const d=new Date(); d.setDate(d.getDate()-n); return d.toISOString().slice(0,10); }
+function localDateKey(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+}
+function todayStr(){ return localDateKey(); }
+function daysAgoStr(n){ const d=new Date(); d.setDate(d.getDate()-n); return localDateKey(d); }
 
 function computeStreak(){
   const set = new Set(appData.history);
@@ -122,7 +128,7 @@ function computeStreak(){
   // if today not done yet, streak counts up to yesterday
   if (!set.has(todayStr())) cursor.setDate(cursor.getDate()-1);
   while (true) {
-    const s = cursor.toISOString().slice(0,10);
+    const s = localDateKey(cursor);
     if (set.has(s)) { streak++; cursor.setDate(cursor.getDate()-1); }
     else break;
   }
@@ -137,7 +143,7 @@ function weekDoneCount(){
   for (let i=0;i<7;i++){
     const d = new Date(now);
     d.setDate(now.getDate() - dow + i);
-    const s = d.toISOString().slice(0,10);
+    const s = localDateKey(d);
     const done = set.has(s);
     if (d <= now && done) count++;
     flags.push({label:["א","ב","ג","ד","ה","ו","ש"][i], done, isToday: s===todayStr(), future: d>now});
@@ -145,7 +151,7 @@ function weekDoneCount(){
   return {count, flags};
 }
 function streakGradeLabel(){
-  const total = appData.history.length;
+  const total = computeStreak();
   for (const g of STREAK_GRADES) if (total >= g.min) return g.label;
   return STREAK_GRADES[STREAK_GRADES.length-1].label;
 }
@@ -216,6 +222,10 @@ function enterStation(idx){
   render();
   const st = STATIONS[idx];
   speak(`תחנה ${st.id} מתוך שבע. ${st.name}. ${st.hint}`);
+  st.cues.filter(c => c.t === 0).forEach(c => {
+    spokenCueKeys.add(st.id + '_' + c.t);
+    speak(c.text);
+  });
   startTimer();
 }
 function startTimer(){
@@ -230,7 +240,7 @@ function startTimer(){
     });
     if (elapsed === Math.max(1, st.duration-4) && !spokenCueKeys.has('feel_'+st.id)) {
       spokenCueKeys.add('feel_'+st.id);
-      speak(`אמור להרגיש: ${st.feel}`);
+      speak(`מה אמורים להרגיש: ${st.feel}`);
     }
     if (elapsed >= st.duration) {
       stopTimer();
@@ -320,9 +330,9 @@ function renderHome(){
     <div class="hero">
       <div class="hero-emoji">🌿</div>
       <h1>תנו לעיניים רגע לנשום</h1>
-      <p class="sub">בלי הבטחות קסם — רק הרגל יומי קטן</p>
-      <button class="cta" onclick="startFullTraining()">מתחילים אימון</button>
-      <div class="hero-note">אימון אחד — כ-5 דקות, שבע תחנות</div>
+      <p class="sub">בלי הבטחות קסם, רק הרגל יומי קטן</p>
+      <button class="cta" onclick="startFullTraining()">התחלת אימון</button>
+      <div class="hero-note">אימון אחד, כחמש דקות ושבע תחנות</div>
     </div>
 
     <div class="stats-strip">
@@ -345,11 +355,11 @@ function renderHome(){
         <span class="goal-num">${goal}</span>
         <button class="small" onclick="changeGoal(1)">＋</button>
       </div>
-      <div class="goal-msg">${remain===0 ? "היעד השבועי הושג! כל הכבוד" : `עוד ${remain} אימונים להשגת היעד השבועי`}</div>
+      <div class="goal-msg">${remain===0 ? "היעד השבועי הושג! כל הכבוד" : `נשארו עוד ${remain} אימונים להשגת היעד השבועי`}</div>
     </div>
 
     <div class="card">
-      <div class="goals-title" style="margin-bottom:10px">רשת שבע התחנות</div>
+      <div class="goals-title" style="margin-bottom:10px">שבע תחנות האימון</div>
       <div class="station-grid">
         ${STATIONS.map((st,i)=>`
           <div class="station-card" onclick="startSingleStation(${i})">
@@ -364,8 +374,8 @@ function renderHome(){
     <div class="card break-card" onclick="enterBreakMode()">
       <div class="break-icon">⏱️</div>
       <div>
-        <div class="goals-title">מצב הפסקת 20-20-20</div>
-        <div class="st-hint">טיימר עגול לעבודה מול מסך: כל 20 דקות, 20 שניות מבט למרחק</div>
+        <div class="goals-title">מצב הפסקת עשרים-עשרים-עשרים</div>
+        <div class="st-hint">טיימר לעבודה מול מסך: כל עשרים דקות, עשרים שניות של מבט למרחק</div>
       </div>
     </div>
 
@@ -414,11 +424,11 @@ function renderTraining(){
         ${st.steps.map(s=>`<li>${s}</li>`).join('')}
       </ol>
       ${st.pressureNote ? `<div class="pressure-note">${st.pressureNote}</div>` : ''}
-      <div class="feel-line">אמור להרגיש: ${st.feel}</div>
+      <div class="feel-line">מה אמורים להרגיש: ${st.feel}</div>
 
       <div class="train-controls">
         <button id="pauseBtn" onclick="togglePause()">השהה</button>
-        <button onclick="skipStation()">דלג לתחנה הבאה</button>
+        <button onclick="skipStation()">דלג על התחנה</button>
       </div>
     </div>
     ${footerHtml()}
@@ -444,7 +454,7 @@ function renderSummary(){
       <h2>האימון של היום נרשם</h2>
       <p>הרצף הנוכחי: <b>${streak}</b> ימים ברצף</p>
       <p>המצב השבועי: <b>${count} / ${goal}</b> אימונים</p>
-      <p>דרגת הדבקה: <b>${streakGradeLabel()}</b></p>
+      <p>רמת ההתמדה: <b>${streakGradeLabel()}</b></p>
       <button class="cta" onclick="goHome()">חזרה למסך הבית</button>
     </div>
     ${footerHtml()}
@@ -461,9 +471,9 @@ function renderBreak(){
     <div class="card break-view">
       <div class="break-phase" id="breakPhaseLabel"></div>
       <div class="break-ring"><div class="break-num" id="breakNum"></div></div>
-      <div class="break-note">הטיימר פועל רק כל עוד הדף הזה פתוח. אפשר לעבור שלב בכל רגע.</div>
+      <div class="break-note">הטיימר פועל כל עוד הדף פתוח. אפשר לעבור שלב בכל רגע.</div>
       <div class="train-controls">
-        <button onclick="breakSwitchNow()">מעבר שלב עכשיו</button>
+        <button onclick="breakSwitchNow()">מעבר לשלב הבא עכשיו</button>
       </div>
     </div>
     ${footerHtml()}
