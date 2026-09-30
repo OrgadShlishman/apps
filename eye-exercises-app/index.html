@@ -6,6 +6,7 @@
 <title>רגע לעיניים</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0f2a24">
+<meta name="description" content="אימון קצר ועדין להפסקות ולנוחות מול מסכים">
 <link rel="apple-touch-icon" href="icon.png">
 <style>
   * { box-sizing:border-box; }
@@ -76,7 +77,10 @@
   .anim-area { height:120px; display:flex; align-items:center; justify-content:center; margin:10px 0; }
 
   .timer-ring-wrap { margin:6px 0; }
+  .timer-label { color:#9fd8c4; font-size:12px; margin-bottom:2px; }
   .timer-num { font-size:34px; font-weight:bold; }
+  .demo-title { color:#9fd8c4; font-size:12px; margin-top:8px; }
+  .start-station { background:#2ecc87 !important; color:#04241a !important; font-weight:bold; }
   .progress-bar { height:6px; background:#0f2a24; border-radius:4px; overflow:hidden; margin:8px 0 16px; }
   .progress-fill { height:100%; background:#2ecc87; transition:width 1s linear; }
 
@@ -85,7 +89,11 @@
   .feel-line { font-size:13px; color:#9fd8c4; font-style:italic; margin-bottom:14px; }
 
   .train-controls { display:flex; gap:10px; justify-content:center; }
-  .train-controls button { background:#0f2a24; border:1px solid #2a5c4d; color:#eafff5; border-radius:10px; padding:10px 16px; font-size:13px; cursor:pointer; }
+  .train-controls button { background:#0f2a24; border:1px solid #2a5c4d; color:#eafff5; border-radius:10px; padding:10px 16px; font-size:13px; cursor:pointer; min-height:44px; }
+  button:focus-visible, .station-card:focus-visible, a:focus-visible { outline:3px solid #ffd166; outline-offset:3px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important; }
+  }
 
   .summary-card { text-align:center; }
   .summary-card p { font-size:14px; margin:6px 0; }
@@ -115,9 +123,9 @@
   .anim-fig8 .mover { position:absolute; width:14px; height:14px; border-radius:50%; background:#2ecc87;
     animation: fig8 6s linear infinite; }
   @keyframes fig8 {
-    0% { left:0; top:45px; } 12.5%{left:45px; top:0;} 25%{left:90px; top:45px;} 37.5%{left:45px; top:90px;}
-    50% { left:0; top:45px; } 62.5%{left:-45px; top:0;} 75%{left:-90px; top:45px;} 87.5%{left:-45px; top:90px;}
-    100% { left:0; top:45px; }
+    0% { left:8px; top:38px; } 12.5%{left:42px; top:8px;} 25%{left:76px; top:38px;} 37.5%{left:42px; top:68px;}
+    50% { left:8px; top:38px; } 62.5%{left:42px; top:8px;} 75%{left:76px; top:38px;} 87.5%{left:42px; top:68px;}
+    100% { left:8px; top:38px; }
   }
 
   .anim-rotate { position:relative; width:100px; height:100px; }
@@ -135,8 +143,8 @@
 </style>
 </head>
 <body>
-<button id="voiceBtn" onclick="toggleVoice()">🔊</button>
+<button id="voiceBtn" onclick="toggleVoice()" aria-label="הפעלה או השתקה של הקריינות" title="הפעלה או השתקה של הקריינות">🔊</button>
 <div id="app"></div>
-<script src="app.js"></script>
+<script src="app.js?v=4"></script>
 </body>
 </html>

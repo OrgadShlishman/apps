@@ -199,6 +199,8 @@ let state = { screen:'home', stationIdx:0, singleStation:false };
 let timerHandle = null;
 let elapsed = 0;
 let paused = false;
+let stationStarted = false;
+let timerStartedAt = null;
 let spokenCueKeys = new Set();
 
 const root = document.getElementById('app');
@@ -217,43 +219,63 @@ function startSingleStation(idx){
   enterStation(idx);
 }
 function enterStation(idx){
-  elapsed = 0; paused = false; spokenCueKeys = new Set();
+  stopTimer();
+  elapsed = 0; paused = false; stationStarted = false; timerStartedAt = null; spokenCueKeys = new Set();
   state.stationIdx = idx;
   render();
-  const st = STATIONS[idx];
-  speak(`תחנה ${st.id} מתוך שבע. ${st.name}. ${st.hint}`);
-  st.cues.filter(c => c.t === 0).forEach(c => {
-    spokenCueKeys.add(st.id + '_' + c.t);
-    speak(c.text);
-  });
+}
+function announceStationStart(){
+  const st = STATIONS[state.stationIdx];
+  const firstCue = st.cues.find(c => c.t === 0);
+  if (firstCue) spokenCueKeys.add(st.id + '_' + firstCue.t);
+  speak([`תחנה ${st.id} מתוך שבע. ${st.name}. ${st.hint}`, firstCue?.text].filter(Boolean).join('. '));
+}
+function startCurrentStation(){
+  if (stationStarted && !paused) return;
+  stationStarted = true;
+  paused = false;
+  timerStartedAt = Date.now() - elapsed * 1000;
+  announceStationStart();
   startTimer();
+  renderTraining();
 }
 function startTimer(){
   stopTimer();
   timerHandle = setInterval(()=>{
-    if (paused) return;
-    elapsed++;
+    if (!stationStarted || paused || timerStartedAt === null) return;
+    elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
     const st = STATIONS[state.stationIdx];
     st.cues.forEach(c=>{
       const key = st.id+'_'+c.t;
-      if (elapsed === c.t && !spokenCueKeys.has(key)) { spokenCueKeys.add(key); speak(c.text); }
+      if (elapsed >= c.t && !spokenCueKeys.has(key)) { spokenCueKeys.add(key); speak(c.text); }
     });
-    if (elapsed === Math.max(1, st.duration-4) && !spokenCueKeys.has('feel_'+st.id)) {
+    if (elapsed >= Math.max(1, st.duration-4) && !spokenCueKeys.has('feel_'+st.id)) {
       spokenCueKeys.add('feel_'+st.id);
       speak(`מה אמורים להרגיש: ${st.feel}`);
     }
     if (elapsed >= st.duration) {
+      elapsed = st.duration;
+      updateTimerUI();
       stopTimer();
       onStationDone();
       return;
     }
     updateTimerUI();
-  }, 1000);
+  }, 250);
 }
 function stopTimer(){ if (timerHandle) { clearInterval(timerHandle); timerHandle=null; } }
 function togglePause(){
-  paused = !paused;
-  document.getElementById('pauseBtn').textContent = paused ? "המשך" : "השהה";
+  if (!stationStarted) return;
+  if (paused) {
+    paused = false;
+    timerStartedAt = Date.now() - elapsed * 1000;
+    startTimer();
+  } else {
+    elapsed = Math.floor((Date.now() - timerStartedAt) / 1000);
+    paused = true;
+    stopTimer();
+  }
+  renderTraining();
 }
 function skipStation(){ stopTimer(); onStationDone(); }
 function onStationDone(){
@@ -413,9 +435,11 @@ function renderTraining(){
       <div class="st-title">תחנה ${st.id} מתוך 7 — ${st.name}</div>
       ${st.equipment ? `<div class="eq-note">דרוש: ${st.equipment}</div>` : ''}
 
-      <div class="anim-area">${stationAnimHtml(st.anim)}</div>
+      <div class="demo-title">המחשה לתנועה</div>
+      <div class="anim-area" role="img" aria-label="המחשה מונפשת לתרגיל">${stationAnimHtml(st.anim)}</div>
 
       <div class="timer-ring-wrap">
+        <div class="timer-label">${stationStarted ? (paused ? "מושהה" : "זמן שנותר") : "מוכן להתחלה"}</div>
         <div class="timer-num">${fmtTime(remaining)}</div>
       </div>
       <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
@@ -508,6 +532,12 @@ function footerHtml(){
     </div>
   `;
 }
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.screen === 'training' && stationStarted && !paused) {
+    updateTimerUI();
+  }
+});
 
 /* Init */
 render();
